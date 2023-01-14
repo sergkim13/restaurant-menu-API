@@ -5,3 +5,5 @@ __pycache__/
 .DS_Store
 coverage.xml
 dist/
+tempCodeRunnerFile.py
+migrations/
