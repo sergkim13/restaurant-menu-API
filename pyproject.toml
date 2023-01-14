@@ -8,6 +8,8 @@ packages = [{include = "ylab_project"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+fastapi = "^0.89.1"
+uvicorn = "^0.20.0"
 
 
 [build-system]
