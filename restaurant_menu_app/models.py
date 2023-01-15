@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, MetaData, BigInteger, String, ForeignKey, Identity, Float)
+    Column, MetaData, BigInteger, String, ForeignKey, Identity, Float, UniqueConstraint)
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -11,10 +11,11 @@ class Menu(Base):
     __tablename__ = 'menus'
 
     id = Column(BigInteger, Identity(always=True), primary_key=True)
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
 
-    menu_submenus = relationship("Submenu", back_populates="main_menu")
+    menu_submenus = relationship(
+        "Submenu", cascade="all, delete", back_populates="main_menu")
 
 
 class Submenu(Base):
@@ -26,11 +27,15 @@ class Submenu(Base):
     description = Column(String, nullable=False)
 
     main_menu = relationship("Menu", back_populates="menu_submenus")
-    submenu_dishes = relationship("Dish", back_populates="submenu")
+    submenu_dishes = relationship(
+        "Dish", cascade="all, delete", back_populates="submenu")
+
+    __table_args__ = (
+        UniqueConstraint("menu_id", "title", name='_menu_submenu_uc'),)
 
 
 class Dish(Base):
-    __tablename__ = 'dish'
+    __tablename__ = 'dishes'
 
     id = Column(BigInteger, Identity(always=True), primary_key=True)
     submenu_id = Column(BigInteger, ForeignKey("submenus.id"))
@@ -40,32 +45,5 @@ class Dish(Base):
 
     submenu = relationship("Submenu", back_populates="submenu_dishes")
 
-
-
-
-# menu = Table(
-#     "menus",
-#     metadata,
-#     Column("id", BigInteger, Identity(always=True), primary_key=True),
-#     Column("title", String, nullable=False),
-#     Column("description", String, nullable=False),
-# )
-
-# submenu = Table(
-#     "submenus",
-#     metadata,
-#     Column("id", BigInteger, Identity(always=True), primary_key=True),
-#     Column("menu_id", BigInteger, ForeignKey(menu.c.id)),
-#     Column("title", String, nullable=False),
-#     Column("description", String, nullable=False),
-# )
-
-# dish = Table(
-#     "dishes",
-#     metadata,
-#     Column("id", BigInteger, Identity(always=True), primary_key=True),
-#     Column("submenu_id", BigInteger, ForeignKey(submenu.c.id)),
-#     Column("title", String, nullable=False),
-#     Column("description", String, nullable=False),
-#     Column("price", Float),
-# )
+    __table_args__ = (
+        UniqueConstraint("submenu_id", "title", name='_submenu_dish_uc'),)
