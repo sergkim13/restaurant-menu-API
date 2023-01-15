@@ -2,4 +2,4 @@ install:
 	poetry install
 
 start:
-	poetry run uvicorn ylab_project.app:app --reload
+	poetry run uvicorn restaurant_menu_app.main:app --reload
