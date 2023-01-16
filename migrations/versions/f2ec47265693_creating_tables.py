@@ -1,8 +1,8 @@
 """Creating tables
 
-Revision ID: e28ee2b987fc
+Revision ID: f2ec47265693
 Revises: 
-Create Date: 2023-01-16 21:37:52.337600
+Create Date: 2023-01-16 22:37:52.633023
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e28ee2b987fc'
+revision = 'f2ec47265693'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,20 +27,20 @@ def upgrade() -> None:
     )
     op.create_table('submenus',
     sa.Column('id', sa.BigInteger(), sa.Identity(always=True), nullable=False),
-    sa.Column('menu_id', sa.BigInteger(), nullable=True),
+    sa.Column('menu_id', sa.BigInteger(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['menu_id'], ['menus.id'], ),
+    sa.ForeignKeyConstraint(['menu_id'], ['menus.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('menu_id', 'title', name='_menu_submenu_uc')
     )
     op.create_table('dishes',
     sa.Column('id', sa.BigInteger(), sa.Identity(always=True), nullable=False),
-    sa.Column('submenu_id', sa.BigInteger(), nullable=True),
+    sa.Column('submenu_id', sa.BigInteger(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
     sa.Column('price', sa.Float(), nullable=True),
-    sa.ForeignKeyConstraint(['submenu_id'], ['submenus.id'], ),
+    sa.ForeignKeyConstraint(['submenu_id'], ['submenus.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('submenu_id', 'title', name='_submenu_dish_uc')
     )

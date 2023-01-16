@@ -16,20 +16,20 @@ class Menu(Base):
     description = Column(String, nullable=False)
 
     menu_submenus = relationship(
-        "Submenu", cascade="all, delete", back_populates="main_menu")
+        "Submenu", cascade="save-update, merge, delete", passive_deletes=True, back_populates="main_menu")
 
 
 class Submenu(Base):
     __tablename__ = 'submenus'
 
     id = Column(BigInteger, Identity(always=True), primary_key=True)
-    menu_id = Column(BigInteger, ForeignKey("menus.id"))
+    menu_id = Column(BigInteger, ForeignKey("menus.id", ondelete='CASCADE'), nullable=False)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
     main_menu = relationship("Menu", back_populates="menu_submenus")
     submenu_dishes = relationship(
-        "Dish", cascade="all, delete", back_populates="submenu")
+        "Dish", cascade="save-update, merge, delete", passive_deletes=True, back_populates="submenu")
 
     __table_args__ = (
         UniqueConstraint("menu_id", "title", name='_menu_submenu_uc'),)
@@ -39,7 +39,7 @@ class Dish(Base):
     __tablename__ = 'dishes'
 
     id = Column(BigInteger, Identity(always=True), primary_key=True)
-    submenu_id = Column(BigInteger, ForeignKey("submenus.id"))
+    submenu_id = Column(BigInteger, ForeignKey("submenus.id", ondelete='CASCADE'), nullable=False)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
     price = Column(Float)
