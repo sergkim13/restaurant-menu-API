@@ -98,11 +98,7 @@ def delete_submenu(menu_id: str, submenu_id: str, db: Session):
 
 # Dish CRUD operations
 def read_dishes(menu_id: str, submenu_id: str, db: Session):
-    return db.query(models.Menu, models.Submenu, models.Dish).with_entities(
-        models.Dish.id,
-        models.Dish.title,
-        models.Dish.description
-    ).filter(
+    return db.query(models.Dish).filter(
         models.Menu.id == models.Submenu.menu_id,
         models.Submenu.id == models.Dish.submenu_id,
         models.Menu.id == menu_id,
@@ -110,31 +106,19 @@ def read_dishes(menu_id: str, submenu_id: str, db: Session):
 
 
 def read_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session):
-    return db.query(models.Menu, models.Submenu, models.Dish).with_entities(
-        models.Dish.id,
-        models.Dish.title,
-        models.Dish.description
-        ).filter(
-            models.Menu.id == models.Submenu.menu_id,
-            models.Submenu.id == models.Dish.submenu_id,
+    return db.query(models.Dish).join(models.Dish.submenu).join(models.Submenu.main_menu).\
+        filter(
             models.Menu.id == menu_id,
             models.Dish.submenu_id == submenu_id,
-            models.Dish.id == dish_id
-            ).first()
+            models.Dish.id == dish_id).first()
 
 
 def read_dish_by_title(menu_id: str, submenu_id: str, new_dish_title: str, db: Session):
-    return db.query(models.Menu, models.Submenu, models.Dish).with_entities(
-        models.Dish.id,
-        models.Dish.title,
-        models.Dish.description
-        ).filter(
-            models.Menu.id == models.Submenu.menu_id,
-            models.Submenu.id == models.Dish.submenu_id,
+    return db.query(models.Dish).join(models.Dish.submenu).join(models.Submenu.main_menu).\
+        filter(
             models.Menu.id == menu_id,
             models.Dish.submenu_id == submenu_id,
-            models.Dish.title == new_dish_title
-            ).first()
+            models.Dish.title == new_dish_title).first()
 
 
 def create_dish(submenu_id: str, new_dish: schemas.DishCreate, db: Session):

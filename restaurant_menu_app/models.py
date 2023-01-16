@@ -1,14 +1,15 @@
 from sqlalchemy import (
-    Column, MetaData, BigInteger, String, ForeignKey, Identity, Float, UniqueConstraint)
+    Table, Column, MetaData, BigInteger, String, ForeignKey, Identity, Float, UniqueConstraint)
 from sqlalchemy.orm import relationship
 
-from .database import Base
+
+from restaurant_menu_app.database import Base
 
 metadata = MetaData()
 
 
 class Menu(Base):
-    __tablename__ = 'menus'
+    __tablename__ = "menus"
 
     id = Column(BigInteger, Identity(always=True), primary_key=True)
     title = Column(String, nullable=False, unique=True)

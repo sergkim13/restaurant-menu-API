@@ -43,9 +43,7 @@ class SubmenuCreate(BaseModel):
 
 
 class SubmenuUpdate(SubmenuCreate):
-    menu_id: str
-    title: str
-    description: str
+    pass
 
     class Config:
         orm_mode = True
@@ -53,7 +51,6 @@ class SubmenuUpdate(SubmenuCreate):
 
 class DishInfo(BaseModel):
     id: str
-    submenu_id: str
     title: str
     description: str
     price: str
@@ -72,10 +69,7 @@ class DishCreate(BaseModel):
 
 
 class DishUpdate(DishCreate):
-    submenu_id: str
-    title: str
-    description: str
-    price: str
+    pass
 
     class Config:
         orm_mode = True
