@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class MenuInfo(BaseModel):
@@ -56,10 +56,14 @@ class DishInfo(BaseModel):
     id: str
     title: str
     description: str
-    price: str
+    price: float
 
     class Config:
         orm_mode = True
+
+    @validator('price')
+    def normalize_price(cls, price):
+        return '{0:0.2f}'.format(price)
 
 
 class DishCreate(BaseModel):
