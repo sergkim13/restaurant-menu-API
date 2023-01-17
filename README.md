@@ -1,5 +1,7 @@
 # Restaurant menu API (FastApi)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/88f08c3ce1a9a1d195c5/maintainability)](https://codeclimate.com/github/sergkim13/restaurant_menu_API-FastAPI/maintainability)
+
 ### Description:
 Restaurant menu API allows you to get information about menus, submenus and dishes. See "Task description" section below for more.
 Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic.
@@ -11,9 +13,9 @@ Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic.
 ### Install:
 1. Clone repository: `https://github.com/sergkim13/ylab_project.git`
 2. Type `make install` for installing required dependencies by Poetry
-3. Type `make prepare-migrations` for preparing alembic migraions
+3. Type `make prepare-migrations` for preparing alembic migrations
 4. Move `env.py ` from project root to migrations dir, created in step 3, with replacement 
-5. Fill in .env with your local postgreSQL database, username and password for database connection
+5. Fill in `.env` with your local PostgreSQL DB name, DB username and DB password
 6. Type `make migrations` for creating tables
 7. Type `make start` for application startup
 
