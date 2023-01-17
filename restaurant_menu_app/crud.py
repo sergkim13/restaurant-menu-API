@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 import sqlalchemy
-from sqlalchemy import func, select
+from sqlalchemy import func, distinct
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from . import models, schemas
@@ -8,11 +8,34 @@ from . import models, schemas
 
 # Menu CRUD operations
 def read_menus(db: Session):
-    return db.query(models.Menu).all()
+    return db.query(
+        models.Menu.id,
+        models.Menu.title,
+        models.Menu.description,
+        func.count(distinct(models.Submenu.id)).label('submenus_count'),
+        func.count(models.Dish.id).label('dishes_count')
+        ).join(
+            models.Submenu,
+            models.Submenu.menu_id == models.Menu.id,
+            isouter=True).join(models.Dish, models.Dish.submenu_id == models.Submenu.id, isouter=True).group_by(
+            models.Menu.id).all()
+
 
 
 def read_menu(menu_id: str, db: Session):
-    return db.query(models.Menu).filter(models.Menu.id == menu_id).first()
+    return db.query(
+        models.Menu.id,
+        models.Menu.title,
+        models.Menu.description,
+        func.count(distinct(models.Submenu.id)).label('submenus_count'),
+        func.count(models.Dish.id).label('dishes_count')
+        ).join(
+            models.Submenu,
+            models.Submenu.menu_id == models.Menu.id,
+            isouter=True).join(models.Dish, models.Dish.submenu_id == models.Submenu.id, isouter=True).filter(
+            models.Menu.id == menu_id
+            ).group_by(
+            models.Menu.id).first()
 
 
 def read_menu_by_title(menu_title: str, db: Session):
@@ -24,21 +47,19 @@ def create_menu(new_menu: schemas.MenuCreate, db: Session):
     db.add(menu)
     db.commit()
     db.refresh(menu)
-    return menu
+
+    return read_menu(menu.id, db)
 
 
 def update_menu(menu_id: str, patch: schemas.MenuUpdate, db: Session):
     db.query(models.Menu).filter(models.Menu.id == menu_id).update(patch.dict())
     db.commit()
-    return read_menu(menu_id, db)
 
 
 def delete_menu(menu_id: str, db: Session):
     menu = db.query(models.Menu).filter(models.Menu.id == menu_id).first()
     db.delete(menu)
     db.commit()
-    message = {"status": True, "message": "The menu has been deleted"}
-    return message
 
 
 # Submenu CRUD operations
@@ -64,16 +85,14 @@ def read_submenu(menu_id: str, submenu_id: str, db: Session):
         models.Submenu.title,
         models.Submenu.description,
         func.count(models.Dish.id).label('dishes_count')
-        ).join(
+        ).join(models.Menu, models.Menu.id == models.Submenu.menu_id).join(
             models.Dish,
             models.Dish.submenu_id == models.Submenu.id,
             isouter=True).filter(
             models.Menu.id == menu_id,
             models.Submenu.id == submenu_id
             ).group_by(
-            models.Submenu.id,
-            models.Submenu.title,
-            models.Submenu.description).first()
+            models.Submenu.id).first()
 
 
 def read_submenu_by_title(menu_id: str, new_submenu_title: str, db: Session):
@@ -101,7 +120,6 @@ def update_submenu(menu_id: str, submenu_id: str, patch: schemas.SubmenuUpdate, 
         models.Submenu.id == submenu_id, models.Submenu.menu_id == menu_id
         ).update(patch.dict())
     db.commit()
-    return read_submenu(menu_id, submenu_id, db)
 
 
 def delete_submenu(menu_id: str, submenu_id: str, db: Session):
@@ -110,8 +128,6 @@ def delete_submenu(menu_id: str, submenu_id: str, db: Session):
         models.Submenu.menu_id == menu_id).first()
     db.delete(submenu)
     db.commit()
-    message = {"status": True, "message": "The submenu has been deleted"}
-    return message
 
 
 # Dish CRUD operations
@@ -139,7 +155,7 @@ def read_dish_by_title(menu_id: str, submenu_id: str, new_dish_title: str, db: S
             models.Dish.title == new_dish_title).first()
 
 
-def create_dish(submenu_id: str, new_dish: schemas.DishCreate, db: Session):
+def create_dish(menu_id: str, submenu_id: str, new_dish: schemas.DishCreate, db: Session):
     dish = models.Dish(submenu_id=submenu_id, **new_dish.dict())
 
     try:
@@ -149,15 +165,14 @@ def create_dish(submenu_id: str, new_dish: schemas.DishCreate, db: Session):
     except IntegrityError:
         raise HTTPException(status_code=404, detail='Menu or submenu not found')
 
-    return dish
+    return read_dish(menu_id, submenu_id, dish.id, db)
 
 
-def update_dish(menu_id: str, submenu_id: str, dish_id: str, patch: schemas.DishUpdate, db: Session):
+def update_dish(submenu_id: str, dish_id: str, patch: schemas.DishUpdate, db: Session):
     db.query(models.Dish).filter(
         models.Dish.id == dish_id, models.Dish.submenu_id == submenu_id
         ).update(patch.dict())
     db.commit()
-    return read_dish(menu_id, submenu_id, dish_id, db)
 
 
 def delete_dish(submenu_id: str, dish_id: str, db: Session):
@@ -166,5 +181,3 @@ def delete_dish(submenu_id: str, dish_id: str, db: Session):
         models.Dish.submenu_id == submenu_id).first()
     db.delete(dish)
     db.commit()
-    message = {"status": True, "message": "The dish has been deleted"}
-    return message
