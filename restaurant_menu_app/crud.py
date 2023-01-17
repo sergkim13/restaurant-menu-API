@@ -41,17 +41,39 @@ def delete_menu(menu_id: str, db: Session):
     return message
 
 
-
 # Submenu CRUD operations
 def read_submenus(menu_id: str, db: Session):
-    return db.query(models.Submenu).filter(models.Submenu.menu_id == menu_id).all()
+    return db.query(
+        models.Submenu.id,
+        models.Submenu.title,
+        models.Submenu.description,
+        func.count(models.Dish.id).label('dishes_count')
+        ).join(
+            models.Menu,
+            models.Menu.id == models.Submenu.menu_id).join(
+            models.Dish,
+            models.Dish.submenu_id == models.Submenu.id,
+            isouter=True).filter(
+            models.Menu.id == menu_id,
+            ).group_by(models.Submenu.id).all()
 
 
 def read_submenu(menu_id: str, submenu_id: str, db: Session):
-    return db.query(models.Submenu).filter(
-            models.Submenu.menu_id == menu_id,
+    return db.query(
+        models.Submenu.id,
+        models.Submenu.title,
+        models.Submenu.description,
+        func.count(models.Dish.id).label('dishes_count')
+        ).join(
+            models.Dish,
+            models.Dish.submenu_id == models.Submenu.id,
+            isouter=True).filter(
+            models.Menu.id == menu_id,
             models.Submenu.id == submenu_id
-            ).first()
+            ).group_by(
+            models.Submenu.id,
+            models.Submenu.title,
+            models.Submenu.description).first()
 
 
 def read_submenu_by_title(menu_id: str, new_submenu_title: str, db: Session):
@@ -71,7 +93,7 @@ def create_submenu(menu_id: str, new_submenu: schemas.SubmenuCreate, db: Session
     except IntegrityError:
         raise HTTPException(status_code=404, detail='Menu not found')
 
-    return submenu
+    return read_submenu(menu_id, submenu.id, db)
 
 
 def update_submenu(menu_id: str, submenu_id: str, patch: schemas.SubmenuUpdate, db: Session):
@@ -90,6 +112,7 @@ def delete_submenu(menu_id: str, submenu_id: str, db: Session):
     db.commit()
     message = {"status": True, "message": "The submenu has been deleted"}
     return message
+
 
 # Dish CRUD operations
 def read_dishes(menu_id: str, submenu_id: str, db: Session):
