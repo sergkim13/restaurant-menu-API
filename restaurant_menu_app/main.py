@@ -4,7 +4,7 @@ from typing import List
 
 from restaurant_menu_app.database import SessionLocal, engine
 from .database import Base
-from . import schemas, crud 
+from . import schemas, crud
 
 Base.metadata.create_all(bind=engine)
 
@@ -41,12 +41,15 @@ def get_menu(menu_id: str, db: Session = Depends(get_db)):
 @app.post('/api/v1/menus', response_model=schemas.MenuInfo, status_code=201)
 def post_menu(new_menu: schemas.MenuCreate, db: Session = Depends(get_db)):
     if crud.read_menu_by_title(new_menu.title, db):
-        raise HTTPException(status_code=400, detail="Menu with that title already exists.")
+        raise HTTPException(
+            status_code=400, detail="Menu with that title already exists.")
+
     return crud.create_menu(new_menu, db)
 
 
 @app.patch('/api/v1/menus/{menu_id}', response_model=schemas.MenuInfo)
 def patch_menu(menu_id: str, patch: schemas.MenuUpdate, db: Session = Depends(get_db)):
+
     if not crud.read_menu(menu_id, db):
         raise HTTPException(status_code=404, detail='menu not found')
     crud.update_menu(menu_id, patch, db)

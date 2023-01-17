@@ -1,8 +1,26 @@
-# Проект на FastApi от Ylab
+# Restaurant menu API (FastApi)
 
-## ДЗ №1
+### Description:
+Restaurant menu API allows you to get information about menus, submenus and dishes. See "Task description" section below for more.
+Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic.
 
- Домашнее задание
+### Requirements:
+1. MacOS / Linux
+2. Poetry
+
+### Install:
+1. Clone repository: `https://github.com/sergkim13/ylab_project.git`
+2. Type `make install` for installing required dependencies by Poetry
+3. Type `make prepare-migrations` for preparing alembic migraions
+4. Move `env.py ` from project root to migrations dir, created in step 3, with replacement 
+5. Fill in .env with your local postgreSQL database, username and password for database connection
+6. Type `make migrations` for creating tables
+7. Type `make start` for application startup
+
+__________
+
+### Task description (stage №1).
+
 Написать проект на FastAPI с использованием PostgreSQL в качестве БД. В проекте следует реализовать REST API по работе с меню ресторана, все CRUD операции. Для проверки задания, к презентаций будет приложена Postman коллекция с тестами. Задание выполнено, если все тесты проходят успешно.
 
 Даны 3 сущности: Меню, Подменю, Блюдо.

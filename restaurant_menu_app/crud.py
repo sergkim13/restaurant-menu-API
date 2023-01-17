@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-import sqlalchemy
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -17,9 +16,10 @@ def read_menus(db: Session):
         ).join(
             models.Submenu,
             models.Submenu.menu_id == models.Menu.id,
-            isouter=True).join(models.Dish, models.Dish.submenu_id == models.Submenu.id, isouter=True).group_by(
-            models.Menu.id).all()
-
+            isouter=True).join(
+                models.Dish,
+                models.Dish.submenu_id == models.Submenu.id,
+                isouter=True).group_by(models.Menu.id).all()
 
 
 def read_menu(menu_id: str, db: Session):
@@ -32,14 +32,16 @@ def read_menu(menu_id: str, db: Session):
         ).join(
             models.Submenu,
             models.Submenu.menu_id == models.Menu.id,
-            isouter=True).join(models.Dish, models.Dish.submenu_id == models.Submenu.id, isouter=True).filter(
-            models.Menu.id == menu_id
-            ).group_by(
-            models.Menu.id).first()
+            isouter=True).join(
+                models.Dish,
+                models.Dish.submenu_id == models.Submenu.id,
+                isouter=True).filter(
+                    models.Menu.id == menu_id).group_by(models.Menu.id).first()
 
 
 def read_menu_by_title(menu_title: str, db: Session):
-    return db.query(models.Menu).filter(models.Menu.title == menu_title).first()
+    return db.query(models.Menu).filter(
+        models.Menu.title == menu_title).first()
 
 
 def create_menu(new_menu: schemas.MenuCreate, db: Session):
@@ -47,12 +49,12 @@ def create_menu(new_menu: schemas.MenuCreate, db: Session):
     db.add(menu)
     db.commit()
     db.refresh(menu)
-
     return read_menu(menu.id, db)
 
 
 def update_menu(menu_id: str, patch: schemas.MenuUpdate, db: Session):
-    db.query(models.Menu).filter(models.Menu.id == menu_id).update(patch.dict())
+    db.query(models.Menu).filter(
+        models.Menu.id == menu_id).update(patch.dict())
     db.commit()
 
 
@@ -72,11 +74,11 @@ def read_submenus(menu_id: str, db: Session):
         ).join(
             models.Menu,
             models.Menu.id == models.Submenu.menu_id).join(
-            models.Dish,
-            models.Dish.submenu_id == models.Submenu.id,
-            isouter=True).filter(
-            models.Menu.id == menu_id,
-            ).group_by(models.Submenu.id).all()
+                models.Dish,
+                models.Dish.submenu_id == models.Submenu.id,
+                isouter=True).filter(
+                    models.Menu.id == menu_id
+                    ).group_by(models.Submenu.id).all()
 
 
 def read_submenu(menu_id: str, submenu_id: str, db: Session):
@@ -85,24 +87,27 @@ def read_submenu(menu_id: str, submenu_id: str, db: Session):
         models.Submenu.title,
         models.Submenu.description,
         func.count(models.Dish.id).label('dishes_count')
-        ).join(models.Menu, models.Menu.id == models.Submenu.menu_id).join(
-            models.Dish,
-            models.Dish.submenu_id == models.Submenu.id,
-            isouter=True).filter(
-            models.Menu.id == menu_id,
-            models.Submenu.id == submenu_id
-            ).group_by(
-            models.Submenu.id).first()
+        ).join(
+            models.Menu,
+            models.Menu.id == models.Submenu.menu_id).join(
+                models.Dish,
+                models.Dish.submenu_id == models.Submenu.id,
+                isouter=True).filter(
+                    models.Menu.id == menu_id,
+                    models.Submenu.id == submenu_id
+                    ).group_by(models.Submenu.id).first()
 
 
 def read_submenu_by_title(menu_id: str, new_submenu_title: str, db: Session):
     return db.query(models.Submenu).filter(
         models.Submenu.title == new_submenu_title,
         models.Submenu.menu_id == menu_id
-    ).first()
+        ).first()
 
 
-def create_submenu(menu_id: str, new_submenu: schemas.SubmenuCreate, db: Session):
+def create_submenu(
+        menu_id: str, new_submenu: schemas.SubmenuCreate, db: Session):
+
     submenu = models.Submenu(menu_id=menu_id, **new_submenu.dict())
 
     try:
@@ -115,7 +120,10 @@ def create_submenu(menu_id: str, new_submenu: schemas.SubmenuCreate, db: Session
     return read_submenu(menu_id, submenu.id, db)
 
 
-def update_submenu(menu_id: str, submenu_id: str, patch: schemas.SubmenuUpdate, db: Session):
+def update_submenu(
+        menu_id: str, submenu_id: str,
+        patch: schemas.SubmenuUpdate, db: Session):
+
     db.query(models.Submenu).filter(
         models.Submenu.id == submenu_id, models.Submenu.menu_id == menu_id
         ).update(patch.dict())
@@ -140,22 +148,29 @@ def read_dishes(menu_id: str, submenu_id: str, db: Session):
 
 
 def read_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session):
-    return db.query(models.Dish).join(models.Submenu).join(models.Menu).\
-        filter(
-            models.Menu.id == menu_id,
-            models.Submenu.id == submenu_id,
-            models.Dish.id == dish_id).first()
+    return db.query(models.Dish).join(
+        models.Submenu).join(
+            models.Menu).filter(
+                models.Menu.id == menu_id,
+                models.Submenu.id == submenu_id,
+                models.Dish.id == dish_id).first()
 
 
-def read_dish_by_title(menu_id: str, submenu_id: str, new_dish_title: str, db: Session):
-    return db.query(models.Dish).join(models.Dish.submenu).join(models.Submenu.main_menu).\
-        filter(
-            models.Menu.id == menu_id,
-            models.Dish.submenu_id == submenu_id,
-            models.Dish.title == new_dish_title).first()
+def read_dish_by_title(
+        menu_id: str, submenu_id: str, new_dish_title: str, db: Session):
+
+    return db.query(models.Dish).join(
+        models.Dish.submenu).join(
+            models.Submenu.main_menu).filter(
+                models.Menu.id == menu_id,
+                models.Dish.submenu_id == submenu_id,
+                models.Dish.title == new_dish_title).first()
 
 
-def create_dish(menu_id: str, submenu_id: str, new_dish: schemas.DishCreate, db: Session):
+def create_dish(
+        menu_id: str, submenu_id: str,
+        new_dish: schemas.DishCreate, db: Session):
+
     dish = models.Dish(submenu_id=submenu_id, **new_dish.dict())
 
     try:
@@ -163,15 +178,19 @@ def create_dish(menu_id: str, submenu_id: str, new_dish: schemas.DishCreate, db:
         db.commit()
         db.refresh(dish)
     except IntegrityError:
-        raise HTTPException(status_code=404, detail='Menu or submenu not found')
+        raise HTTPException(
+            status_code=404, detail='Menu or submenu not found')
 
     return read_dish(menu_id, submenu_id, dish.id, db)
 
 
-def update_dish(submenu_id: str, dish_id: str, patch: schemas.DishUpdate, db: Session):
+def update_dish(
+        submenu_id: str, dish_id: str,
+        patch: schemas.DishUpdate, db: Session):
+
     db.query(models.Dish).filter(
-        models.Dish.id == dish_id, models.Dish.submenu_id == submenu_id
-        ).update(patch.dict())
+        models.Dish.id == dish_id,
+        models.Dish.submenu_id == submenu_id).update(patch.dict())
     db.commit()
 
 
