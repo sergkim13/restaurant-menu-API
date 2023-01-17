@@ -34,12 +34,6 @@ def update_menu(menu_id: str, patch: schemas.MenuUpdate, db: Session):
 
 
 def delete_menu(menu_id: str, db: Session):
-<<<<<<< HEAD
-    # db.query(models.Menu).filter(models.Menu.id == menu_id).delete()
-    # message = {"status": True, "message": "The menu has been deleted"}
-    # return message
-=======
->>>>>>> 3dc4be9 (realaized dish crud. Didnt realize count fields)
     menu = db.query(models.Menu).filter(models.Menu.id == menu_id).first()
     db.delete(menu)
     db.commit()
@@ -89,15 +83,6 @@ def update_submenu(menu_id: str, submenu_id: str, patch: schemas.SubmenuUpdate, 
 
 
 def delete_submenu(menu_id: str, submenu_id: str, db: Session):
-<<<<<<< HEAD
-    # db.query(models.Submenu).filter(
-    #     models.Submenu.id == submenu_id,
-    #     models.Submenu.menu_id == menu_id
-    #     ).delete()
-    # message = {"status": True, "message": "The submenu has been deleted"}
-    # return message
-=======
->>>>>>> 3dc4be9 (realaized dish crud. Didnt realize count fields)
     submenu = db.query(models.Submenu).filter(
         models.Submenu.id == submenu_id,
         models.Submenu.menu_id == menu_id).first()
@@ -153,15 +138,6 @@ def update_dish(menu_id: str, submenu_id: str, dish_id: str, patch: schemas.Dish
 
 
 def delete_dish(submenu_id: str, dish_id: str, db: Session):
-<<<<<<< HEAD
-    # db.query(models.Dish).filter(
-    #     models.Dish.id == dish_id,
-    #     models.Dish.submenu_id == submenu_id
-    #     ).delete()
-    # message = {"status": True, "message": "The dish has been deleted"}
-    # return message
-=======
->>>>>>> 3dc4be9 (realaized dish crud. Didnt realize count fields)
     dish = db.query(models.Dish).filter(
         models.Dish.id == dish_id,
         models.Dish.submenu_id == submenu_id).first()
