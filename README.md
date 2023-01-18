@@ -7,10 +7,16 @@ Restaurant menu API allows you to get information about menus, submenus and dish
 Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic.
 
 ### Requirements:
-1. MacOS / Linux
-2. Poetry
+1. MacOS (prefer) / Linux / Windows10
+2. `Poetry`
+3. `Make` utily for MacOS, Linux.
 
 ### Install:
+0. Install Poetry:
+- MacOS / Linux - `curl -sSL https://install.python-poetry.org | python3 -`
+- Windows10 - `pip install poetry`
+
+
 1. Clone repository: `https://github.com/sergkim13/ylab_project.git`
 2. Type `make install` for installing required dependencies by Poetry
 3. Type `make prepare-migrations` for preparing alembic migrations
@@ -19,6 +25,13 @@ Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic.
 6. Type `make migrations` for creating tables
 7. Type `make start` for application startup
 
+Notes:
+ - *Using Windows you should type direct instructions instead of `make` instructions (see Makefile)*
+ - *Using Linux WSL you may encounter error with installing `psycopg2` to dependencies. Solution:*:
+```
+sudo apt-get install libpq-dev
+pip install psycopg2
+```
 __________
 
 ### Task description (stage №1).
