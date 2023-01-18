@@ -2,11 +2,11 @@ install:
 	poetry install
 
 prepare-migrations:
-	alembic init migrations
+	poetry run alembic init migrations
 
 migrations:
-	alembic revision --autogenerate -m 'Creating tables'
-	alembic upgrade head
+	poetry run alembic revision --autogenerate -m 'Creating tables'
+	poetry run alembic upgrade head
 
 start:
 	poetry run uvicorn restaurant_menu_app.main:app --reload
