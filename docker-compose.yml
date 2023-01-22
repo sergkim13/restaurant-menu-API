@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  restaurant_menu_app:
+    container_name: restaurant_menu_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: >
+      sh -c "
+        echo 'Starting project...' &&
+        uvicorn restaurant_menu_app.main:app --host 0.0.0.0 --reload
+      "
+    volumes:
+      - .:/src
+    networks:
+      - restaurant_menu_app_network
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+  postgres_db:
+    container_name: postgres_db
+    image: postgres:15.1-alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    networks:
+      - restaurant_menu_app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  restaurant_menu_app_network:
+    name: restaurant_menu_app_network
+
+volumes:
+  db-data:
