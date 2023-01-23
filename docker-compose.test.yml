@@ -6,7 +6,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: "pytest -vv"
+    entrypoint: >
+      sh -c "
+        alembic upgrade head &&
+        SQLALCHEMY_SILENCE_UBER_WARNING=1 pytest -vv
+      "
     networks:
       - test_network
   

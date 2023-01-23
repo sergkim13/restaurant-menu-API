@@ -4,7 +4,7 @@ install:
 prepare-migrations:
 	poetry run alembic init migrations
 
-migrations:
+migration:
 	poetry run alembic revision --autogenerate -m 'Creating tables'
 	poetry run alembic upgrade head
 
@@ -13,6 +13,12 @@ start:
 
 lint:
 	poetry run flake8 restaurant_menu_app
+
+compose:
+	docker compose up -d
+
+compose-stop:
+	docker compose down
 
 compose-test:
 	docker compose -f docker-compose.test.yml -p testing up -d

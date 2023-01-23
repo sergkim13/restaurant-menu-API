@@ -2,11 +2,11 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
 
-from restaurant_menu_app.database import SessionLocal, engine
-from .database import Base
+from restaurant_menu_app.database import SessionLocal  #, engine
+# from .database import Base
 from . import schemas, crud
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title='Restaurant menu')
 
