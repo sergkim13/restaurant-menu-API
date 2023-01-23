@@ -6,24 +6,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    entrypoint: >
-      sh -c "
-        echo 'Starting project...' &&
-        uvicorn restaurant_menu_app.main:app --host 0.0.0.0 --reload
-      "
+    command: "pytest -vv"
     networks:
-      - restaurant_menu_app_network
-    ports:
-      - "8000:8000"
-    depends_on:
-      postgres_db:
-        condition: service_healthy
-
+      - test_network
+  
   postgres_db:
     container_name: postgres_db
     image: postgres:15.1-alpine
     volumes:
-      - db-data:/var/lib/postgresql/data/
+      - test-db-data:/var/lib/postgresql/data/
     env_file:
       - .env
     environment:
@@ -35,7 +26,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - restaurant_menu_app_network
+      - test_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
@@ -43,8 +34,8 @@ services:
       retries: 5
 
 networks:
-  restaurant_menu_app_network:
-    name: restaurant_menu_app_network
+  test_network:
+      name: test_network
 
 volumes:
-  db-data:
+  test-db-data:

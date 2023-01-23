@@ -13,3 +13,6 @@ start:
 
 lint:
 	poetry run flake8 restaurant_menu_app
+
+compose-test:
+	docker compose -f docker-compose.test.yml -p testing up -d
