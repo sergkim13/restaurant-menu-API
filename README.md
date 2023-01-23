@@ -4,37 +4,36 @@
 
 ### Description:
 Restaurant menu API allows you to get information about menus, submenus and dishes. See "Task description" section below for more.
-Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic.
+Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker.
 
 ### Requirements:
 1. MacOS (prefer) / Linux / Windows10
-2. `Poetry`
+2. `Docker`
 3. `Make` utily for MacOS, Linux.
 
 ### Install:
-0. Install Poetry:
-- MacOS / Linux - `curl -sSL https://install.python-poetry.org | python3 -`
-- Windows10 - `pip install poetry`
+1. Clone repository: `https://github.com/sergkim13/restaurant_menu_FastAPI.git`
+2. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `compose-stop` to stop app container. 
+3. Type `make compose-test` for running tests in docker container.
 
+__________
+### **Task description (stage №2)**.
+В этом домашнем задании надо написать тесты для ранее разработанных ендпоинтов вашего API после вебинара №1.
+А именно:
+1. Обернуть программные компоненты в контейнеры. Контейнеры должны запускаться по одной команде `docker-compose up -d` или той которая описана вами в readme.md.
+Образы для Docker:
+- (API) python:3.10-slim
+- (DB) 	postgres:15.1-alpine
 
-1. Clone repository: `https://github.com/sergkim13/ylab_project.git`
-2. Type `make install` for installing required dependencies by Poetry
-3. Type `make prepare-migrations` for preparing alembic migrations
-4. Move `env.py ` from project root to migrations dir, created in step 3, with replacement 
-5. Fill in `.env` with your local PostgreSQL DB name, DB username and DB password
-6. Type `make migrations` for creating tables
-7. Type `make start` for application startup
+2. Написать CRUD тесты для ранее разработанного API с помощью библиотеки pytest
+3. Подготовить отдельный контейнер для запуска тестов
 
-Notes:
- - *Using Windows you should type direct instructions instead of `make` instructions (see Makefile)*
- - *Using Linux WSL you may encounter error with installing `psycopg2` to dependencies. Solution:*:
-```
-sudo apt-get install libpq-dev
-pip install psycopg2
-```
+Если FastAPI синхронное - тесты синхронные,
+Иначе FastAPI асинхронное - тесты асинхронные
+
 __________
 
-### Task description (stage №1).
+### **Task description (stage №1)** - ✅.
 
 Написать проект на FastAPI с использованием PostgreSQL в качестве БД. В проекте следует реализовать REST API по работе с меню ресторана, все CRUD операции. Для проверки задания, к презентаций будет приложена Postman коллекция с тестами. Задание выполнено, если все тесты проходят успешно.
 
