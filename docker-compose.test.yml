@@ -13,6 +13,9 @@ services:
       "
     networks:
       - test_network
+    depends_on:
+      postgres_db:
+        condition: service_healthy
   
   postgres_db:
     container_name: postgres_db
