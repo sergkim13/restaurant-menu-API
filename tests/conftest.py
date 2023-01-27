@@ -1,13 +1,14 @@
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy_utils import database_exists, create_database
-from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+from sqlalchemy_utils import create_database, database_exists
+
+from restaurant_menu_app.database import SQLALCHEMY_DATABASE_URL, Base
 from restaurant_menu_app.main import app, get_db
-from restaurant_menu_app.database import Base, SQLALCHEMY_DATABASE_URL
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def db_engine():
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
     if not database_exists:
@@ -17,7 +18,7 @@ def db_engine():
     yield engine
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope='function')
 def db(db_engine):
     connection = db_engine.connect()
 
@@ -33,7 +34,7 @@ def db(db_engine):
     connection.close()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope='function')
 def client(db):
     app.dependency_overrides[get_db] = lambda: db
 

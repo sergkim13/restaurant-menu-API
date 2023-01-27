@@ -63,7 +63,7 @@ class DishInfo(BaseModel):
 
     @validator('price')
     def normalize_price(cls, price):
-        return '{0:0.2f}'.format(price)
+        return f'{price:0.2f}'
 
 
 class DishCreate(BaseModel):
