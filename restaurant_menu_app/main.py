@@ -1,3 +1,5 @@
+import http
+
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
@@ -22,12 +24,22 @@ def home():
 
 
 # Menu routers
-@app.get('/api/v1/menus', response_model=list[schemas.MenuInfo])
+@app.get(
+    path='/api/v1/menus',
+    response_model=list[schemas.MenuInfo],
+    summary='Получение списка всех меню',
+    status_code=http.HTTPStatus.OK,
+)
 def get_menus(db: Session = Depends(get_db)):
     return crud.read_menus(db)
 
 
-@app.get('/api/v1/menus/{menu_id}', response_model=schemas.MenuInfo)
+@app.get(
+    path='/api/v1/menus/{menu_id}',
+    response_model=schemas.MenuInfo,
+    summary='Получение информации о меню',
+    status_code=http.HTTPStatus.OK,
+)
 def get_menu(menu_id: str, db: Session = Depends(get_db)):
     menu = crud.read_menu(menu_id, db)
     if not menu:
@@ -35,7 +47,12 @@ def get_menu(menu_id: str, db: Session = Depends(get_db)):
     return menu
 
 
-@app.post('/api/v1/menus', response_model=schemas.MenuInfo, status_code=201)
+@app.post(
+    path='/api/v1/menus',
+    response_model=schemas.MenuInfo,
+    summary='Создание меню',
+    status_code=http.HTTPStatus.CREATED,
+)
 def post_menu(new_menu: schemas.MenuCreate, db: Session = Depends(get_db)):
     if crud.read_menu_by_title(new_menu.title, db):
         raise HTTPException(
@@ -45,7 +62,12 @@ def post_menu(new_menu: schemas.MenuCreate, db: Session = Depends(get_db)):
     return crud.create_menu(new_menu, db)
 
 
-@app.patch('/api/v1/menus/{menu_id}', response_model=schemas.MenuInfo)
+@app.patch(
+    path='/api/v1/menus/{menu_id}',
+    response_model=schemas.MenuInfo,
+    summary='Обновление меню',
+    status_code=http.HTTPStatus.OK,
+)
 def patch_menu(menu_id: str, patch: schemas.MenuUpdate, db: Session = Depends(get_db)):
 
     if not crud.read_menu(menu_id, db):
@@ -54,7 +76,12 @@ def patch_menu(menu_id: str, patch: schemas.MenuUpdate, db: Session = Depends(ge
     return crud.read_menu(menu_id, db)
 
 
-@app.delete('/api/v1/menus/{menu_id}', response_model=schemas.Message)
+@app.delete(
+    path='/api/v1/menus/{menu_id}',
+    response_model=schemas.Message,
+    summary='Удаление меню',
+    status_code=http.HTTPStatus.OK,
+)
 def delete_menu(menu_id: str, db: Session = Depends(get_db)):
     if not crud.read_menu(menu_id, db):
         raise HTTPException(status_code=404, detail='menu not found')
@@ -64,12 +91,22 @@ def delete_menu(menu_id: str, db: Session = Depends(get_db)):
 
 
 # Submenu routers
-@app.get('/api/v1/menus/{menu_id}/submenus', response_model=list[schemas.SubmenuInfo])
+@app.get(
+    path='/api/v1/menus/{menu_id}/submenus',
+    response_model=list[schemas.SubmenuInfo],
+    summary='Просмотр списка подменю',
+    status_code=http.HTTPStatus.OK,
+)
 def get_submenus(menu_id: str, db: Session = Depends(get_db)):
     return crud.read_submenus(menu_id, db)
 
 
-@app.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}', response_model=schemas.SubmenuInfo)
+@app.get(
+    path='/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    response_model=schemas.SubmenuInfo,
+    summary='Просмотр информации о подменю',
+    status_code=http.HTTPStatus.OK,
+)
 def get_submenu(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
     submenu = crud.read_submenu(menu_id, submenu_id, db)
     if not submenu:
@@ -77,7 +114,12 @@ def get_submenu(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
     return submenu
 
 
-@app.post('/api/v1/menus/{menu_id}/submenus', response_model=schemas.SubmenuInfo, status_code=201)
+@app.post(
+    path='/api/v1/menus/{menu_id}/submenus',
+    response_model=schemas.SubmenuInfo,
+    summary='Создание подменю',
+    status_code=http.HTTPStatus.CREATED,
+)
 def post_submenu(menu_id: str, new_submenu: schemas.SubmenuCreate, db: Session = Depends(get_db)):
     if crud.read_submenu_by_title(menu_id, new_submenu.title, db):
         raise HTTPException(
@@ -86,7 +128,12 @@ def post_submenu(menu_id: str, new_submenu: schemas.SubmenuCreate, db: Session =
     return crud.create_submenu(menu_id, new_submenu, db)
 
 
-@app.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}', response_model=schemas.SubmenuInfo)
+@app.patch(
+    path='/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    response_model=schemas.SubmenuInfo,
+    summary='Обновление подменю',
+    status_code=http.HTTPStatus.OK,
+)
 def patch_submenu(menu_id: str, submenu_id: str, patch: schemas.SubmenuUpdate, db: Session = Depends(get_db)):
     if not crud.read_submenu(menu_id, submenu_id, db):
         raise HTTPException(status_code=404, detail='submenu not found')
@@ -94,7 +141,12 @@ def patch_submenu(menu_id: str, submenu_id: str, patch: schemas.SubmenuUpdate, d
     return crud.read_submenu(menu_id, submenu_id, db)
 
 
-@app.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}', response_model=schemas.Message)
+@app.delete(
+    path='/api/v1/menus/{menu_id}/submenus/{submenu_id}',
+    response_model=schemas.Message,
+    summary='Удаление подменю',
+    status_code=http.HTTPStatus.OK,
+)
 def delete_submenu(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
     if not crud.read_submenu(menu_id, submenu_id, db):
         raise HTTPException(status_code=404, detail='submenu not found')
@@ -104,12 +156,22 @@ def delete_submenu(menu_id: str, submenu_id: str, db: Session = Depends(get_db))
 
 
 # Dish routers
-@app.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', response_model=list[schemas.DishInfo])
+@app.get(
+    path='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    response_model=list[schemas.DishInfo],
+    summary='Просмотр списка блюд',
+    status_code=http.HTTPStatus.OK,
+)
 def get_dishes(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
     return crud.read_dishes(menu_id, submenu_id, db)
 
 
-@app.get('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=schemas.DishInfo)
+@app.get(
+    path='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    response_model=schemas.DishInfo,
+    summary='Просмотр информации о блюде',
+    status_code=http.HTTPStatus.OK,
+)
 def get_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session = Depends(get_db)):
     dish = crud.read_dish(menu_id, submenu_id, dish_id, db)
     if not dish:
@@ -117,7 +179,12 @@ def get_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session = Depends(
     return dish
 
 
-@app.post('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes', response_model=schemas.DishInfo, status_code=201)
+@app.post(
+    path='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
+    response_model=schemas.DishInfo,
+    summary='Создание блюда',
+    status_code=http.HTTPStatus.CREATED,
+)
 def post_dish(menu_id: str, submenu_id: str, new_dish: schemas.DishCreate, db: Session = Depends(get_db)):
     if crud.read_dish_by_title(menu_id, submenu_id, new_dish.title, db):
         raise HTTPException(
@@ -126,7 +193,12 @@ def post_dish(menu_id: str, submenu_id: str, new_dish: schemas.DishCreate, db: S
     return crud.create_dish(menu_id, submenu_id, new_dish, db)
 
 
-@app.patch('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=schemas.DishInfo)
+@app.patch(
+    path='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    response_model=schemas.DishInfo,
+    summary='Обновление блюда',
+    status_code=http.HTTPStatus.OK,
+)
 def patch_dish(menu_id: str, submenu_id: str, dish_id: str, patch: schemas.DishUpdate, db: Session = Depends(get_db)):
     if not crud.read_dish(menu_id, submenu_id, dish_id, db):
         raise HTTPException(status_code=404, detail='dish not found')
@@ -135,7 +207,12 @@ def patch_dish(menu_id: str, submenu_id: str, dish_id: str, patch: schemas.DishU
     return crud.read_dish(menu_id, submenu_id, dish_id, db)
 
 
-@app.delete('/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=schemas.Message)
+@app.delete(
+    path='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}',
+    response_model=schemas.Message,
+    summary='Удаление блюда',
+    status_code=http.HTTPStatus.OK,
+)
 def delete_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session = Depends(get_db)):
     if not crud.read_dish(menu_id, submenu_id, dish_id, db):
         raise HTTPException(status_code=404, detail='dish not found')

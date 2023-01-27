@@ -22,3 +22,6 @@ compose-stop:
 
 compose-test:
 	docker compose -f docker-compose.test.yml -p testing up -d
+
+hooks:
+	poetry run pre-commit run --all-files
