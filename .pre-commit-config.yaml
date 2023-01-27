@@ -1,14 +1,19 @@
+exclude: ^migrations/
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
     -   id: trailing-whitespace  # удаляет лишние пробелы
+        types: [python]
     -   id: end-of-file-fixer  # добавляет пустую строку в конце файла
+        types: [python]
     -   id: check-yaml  # проверяет синтаксис .yaml файлов
-    -   id: check-added-large-files  # проверояет тяжелые файлы на измнения
+    -   id: check-added-large-files  # проверояет тяжелые файлы на изменения
     -   id: check-case-conflict  # проверят файлы, которые могут конфликтовать в файловых системах без учета регистра
     -   id: check-merge-conflict  # проверяет файлы,содержащие конфликтные строки слияния
     -   id: double-quote-string-fixer  # заменяет " на '
+        types: [python]
 
 # Сортирует импорты в проекте
 -   repo: https://github.com/pycqa/isort
@@ -30,7 +35,7 @@ repos:
     rev: v3.3.1
     hooks:
     -   id: pyupgrade
-        args: [ --py10-plus ]
+        args: [ --py310-plus ]
 
 # Форматирует код под PEP-8
 -   repo: https://github.com/pre-commit/mirrors-autopep8
