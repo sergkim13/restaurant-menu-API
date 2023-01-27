@@ -1,0 +1,53 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: trailing-whitespace  # удаляет лишние пробелы
+    -   id: end-of-file-fixer  # добавляет пустую строку в конце файла
+    -   id: check-yaml  # проверяет синтаксис .yaml файлов
+    -   id: check-added-large-files  # проверояет тяжелые файлы на измнения
+    -   id: check-case-conflict  # проверят файлы, которые могут конфликтовать в файловых системах без учета регистра
+    -   id: check-merge-conflict  # проверяет файлы,содержащие конфликтные строки слияния
+    -   id: double-quote-string-fixer  # заменяет " на '
+
+# Сортирует импорты в проекте
+-   repo: https://github.com/pycqa/isort
+    rev: 5.11.4
+    hooks:
+    -   id: isort
+        exclude: __init__.py
+        args: [ --profile, black, --filter-files ]
+
+# Добавляет пропущенные запятые
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v2.4.0
+    hooks:
+    -   id: add-trailing-comma
+        args: [ --py36-plus ]
+
+# Обновляет синтаксис Python кода в соответсвтии с последними версиями
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.3.1
+    hooks:
+    -   id: pyupgrade
+        args: [ --py10-plus ]
+
+# Форматирует код под PEP-8
+-   repo: https://github.com/pre-commit/mirrors-autopep8
+    rev: v2.0.1
+    hooks:
+    -   id: autopep8
+
+# Сканер стилистических ошибок, нарушающих договоренности PEP-8
+-   repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+    -   id: flake8
+        exclude: __init__.py
+        args: [ "--ignore=E501" ]
+
+# Проверка статических типов с помощью mypy
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.991
+    hooks:
+    -   id: mypy
