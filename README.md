@@ -4,7 +4,7 @@
 
 ### Description:
 Restaurant menu API allows you to get information about menus, submenus and dishes. See "Task description" section below for more.
-Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker.
+Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker, Redis.
 
 ### Requirements:
 1. MacOS (prefer) / Linux / Windows10
@@ -15,9 +15,34 @@ Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker.
 1. Clone repository: `https://github.com/sergkim13/restaurant_menu_FastAPI.git`
 2. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `compose-stop` to stop app container. 
 3. Type `make compose-test` for running tests in docker container.
+4. For checking `pre-commit hooks`:
+    - `pip install --user pre-commit`
+    - `pre-commit pre-commit run --all-files`
+
+Pre-commit hooks demo:
+[![asciicast](https://asciinema.org/a/jrqJF7T6zoqNpc1poQD1OKa0C.svg)](https://asciinema.org/a/jrqJF7T6zoqNpc1poQD1OKa0C)
+__________
+### **Task description (stage №3)**.
+В этом домашнем задании надо:
+1. Вынести бизнес логику и запросы в БД в отдельные слои приложения.
+2. Добавить кэш хранилище Redis
+3. Добавить pre-commit хуки в проект
+4. Описать ручки API в соответствий c OpenAPI
+
+Требования:
+- Код должен проходить все линтеры.
+- Код должен соответствовать принципам SOLID, DRY, KISS.
+- Проект должен запускаться по одной команде.
+- Проект должен проходить все Postman тесты (коллекция с Вебинара №1).
+- Тесты написанные вами после Вебинара №2, должны быть актуальны, запускать и успешно проходить
+
+Дополнительно:
+- Проект запускается по одной команде
+- Тесты запускаются по другой
+
 
 __________
-### **Task description (stage №2)**.
+### **Task description (stage №2) - ✅.
 В этом домашнем задании надо написать тесты для ранее разработанных ендпоинтов вашего API после вебинара №1.
 А именно:
 1. Обернуть программные компоненты в контейнеры. Контейнеры должны запускаться по одной команде `docker-compose up -d` или той которая описана вами в readme.md.
