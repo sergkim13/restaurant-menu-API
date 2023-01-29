@@ -19,7 +19,7 @@ services:
     depends_on:
       postgres_db:
         condition: service_healthy
-      redis_cache:
+      redis_db:
         condition: service_healthy
 
   postgres_db:
@@ -28,7 +28,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/
     env_file:
-      - .env
+      - docker_env/.env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -45,8 +45,8 @@ services:
       timeout: 5s
       retries: 5
 
-  redis_cache:
-    container_name: redis_cache
+  redis_db:
+    container_name: redis_db
     image: redis:latest
     expose:
       - 6379

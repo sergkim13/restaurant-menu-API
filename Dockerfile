@@ -1,18 +1,30 @@
+FROM python:3.10-slim as requirements-stage
+
+WORKDIR /tmp
+
+RUN pip install poetry
+
+COPY ./pyproject.toml ./poetry.lock* /tmp/
+
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+
 FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV POETRY_VERSION=1.2.2
+ENV PYTHONPATH "${PYTHONPATH}:/src"
 
 RUN apt-get update && \
-    apt-get -y install libpq-dev gcc && \
-    pip install "poetry==$POETRY_VERSION" --no-cache-dir && \
-    poetry config virtualenvs.create false
+    apt-get -y install libpq-dev gcc
 
 WORKDIR  /src
 
-COPY poetry.lock pyproject.toml /src/
-RUN poetry install --no-root --only main --no-interaction --no-ansi --no-cache
+COPY --from=requirements-stage /tmp/requirements.txt /src/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /src/requirements.txt
 
-
-COPY . /src
+COPY restaurant_menu_app/ /src/restaurant_menu_app/
+COPY migrations/ /src/migrations/
+COPY alembic.ini /src/
+COPY tests/ /src/
+COPY docker_env/.env /src/.env
+COPY config.py /src/
