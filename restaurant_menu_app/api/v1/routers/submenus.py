@@ -1,6 +1,7 @@
 import http
 
 from fastapi import APIRouter, Depends, HTTPException
+from psycopg2.errors import ForeignKeyViolation, UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -27,6 +28,7 @@ router = APIRouter(
     status_code=http.HTTPStatus.OK,
 )
 def get_submenus(menu_id: str, db: Session = Depends(get_db)):
+
     if is_cached('submenu', 'all'):
         return get_cache('submenu', 'all')
 
@@ -42,6 +44,7 @@ def get_submenus(menu_id: str, db: Session = Depends(get_db)):
     status_code=http.HTTPStatus.OK,
 )
 def get_submenu(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
+
     if is_cached('submenu', submenu_id):
         return get_cache('submenu', submenu_id)
 
@@ -61,21 +64,30 @@ def get_submenu(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
     status_code=http.HTTPStatus.CREATED,
 )
 def post_submenu(menu_id: str, new_submenu: scheme.SubmenuCreate, db: Session = Depends(get_db)):
+
     try:
-        submenu = crud.create_submenu(menu_id, new_submenu, db)
-        set_cache('submenu', submenu.id, submenu)
+        new_submenu_id = crud.create_submenu(menu_id, new_submenu, db)
+    except IntegrityError as e:
+        if isinstance(e.orig, UniqueViolation):
+            raise HTTPException(
+                status_code=400, detail='Submenu with that title already exists',
+            )
+        elif isinstance(e.orig, ForeignKeyViolation):
+            raise HTTPException(
+                status_code=400, detail='menu not found',
+            )
+        else:
+            raise
 
-        # Чистим кэш для родительских элементов и получения списков элементов
-        clear_cache('submenu', 'all')
-        clear_cache('menu', menu_id)
-        clear_cache('menu', 'all')
+    new_submenu = crud.read_submenu(menu_id, new_submenu_id, db)
+    set_cache('submenu', new_submenu_id, new_submenu)
 
-        return submenu
+    # Чистим кэш для родительских элементов и получения списков элементов
+    clear_cache('submenu', 'all')
+    clear_cache('menu', menu_id)
+    clear_cache('menu', 'all')
 
-    except IntegrityError:
-        raise HTTPException(
-            status_code=400, detail='Submenu with that title already exists.',
-        )
+    return new_submenu
 
 
 @router.patch(
@@ -85,15 +97,14 @@ def post_submenu(menu_id: str, new_submenu: scheme.SubmenuCreate, db: Session = 
     status_code=http.HTTPStatus.OK,
 )
 def patch_submenu(menu_id: str, submenu_id: str, patch: scheme.SubmenuUpdate, db: Session = Depends(get_db)):
+
     if not crud.read_submenu(menu_id, submenu_id, db):
         raise HTTPException(status_code=404, detail='submenu not found')
 
     crud.update_submenu(menu_id, submenu_id, patch, db)
     updated_submenu = crud.read_submenu(menu_id, submenu_id, db)
-
     set_cache('submenu', submenu_id, updated_submenu)
-    # чистим кэш списка всех подменю, т.к. в одном подменю меняется содержимое
-    clear_cache('submenu', 'all')
+    clear_cache('submenu', 'all')  # чистим кэш получения списка подменю
 
     return updated_submenu
 
@@ -105,8 +116,10 @@ def patch_submenu(menu_id: str, submenu_id: str, patch: scheme.SubmenuUpdate, db
     status_code=http.HTTPStatus.OK,
 )
 def delete_submenu(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
+
     if not crud.read_submenu(menu_id, submenu_id, db):
         raise HTTPException(status_code=404, detail='submenu not found')
+
     crud.delete_submenu(menu_id, submenu_id, db)
     clear_cache('submenu', submenu_id)
 

@@ -28,25 +28,30 @@ dish_deleted = {'status': True, 'message': 'The dish has been deleted'}
 # CRUD fixtures
 @pytest.fixture
 def fixture_menu(db):
-    return crud.create_menu(scheme.MenuCreate(**new_menu), db)
+    menu_id = crud.create_menu(scheme.MenuCreate(**new_menu), db)
+    menu = crud.read_menu(menu_id, db)
+    return menu
 
 
 @pytest.fixture
 def fixture_submenu(db):
-    menu = crud.create_menu(scheme.MenuCreate(**new_menu), db)
-    submenu = crud.create_submenu(
-        menu.id, scheme.SubmenuCreate(**new_submenu), db,
+    menu_id = crud.create_menu(scheme.MenuCreate(**new_menu), db)
+    submenu_id = crud.create_submenu(
+        menu_id, scheme.SubmenuCreate(**new_submenu), db,
     )
-    return menu.id, submenu
+    submenu = crud.read_submenu(menu_id, submenu_id, db)
+    return menu_id, submenu
 
 
 @pytest.fixture
 def fixture_dish(db):
-    menu = crud.create_menu(scheme.MenuCreate(**new_menu), db)
-    submenu = crud.create_submenu(
-        menu.id, scheme.SubmenuCreate(**new_submenu), db,
+    menu_id = crud.create_menu(scheme.MenuCreate(**new_menu), db)
+    submenu_id = crud.create_submenu(
+        menu_id, scheme.SubmenuCreate(**new_submenu), db,
     )
-    return menu.id, submenu.id, crud.create_dish(menu.id, submenu.id, scheme.DishCreate(**new_dish), db)
+    dish_id = crud.create_dish(submenu_id, scheme.DishCreate(**new_dish), db)
+    dish = crud.read_dish(menu_id, submenu_id, dish_id, db)
+    return menu_id, submenu_id, dish
 
 
 def test_get_home(client):

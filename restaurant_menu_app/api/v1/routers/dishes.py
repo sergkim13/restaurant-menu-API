@@ -1,6 +1,7 @@
 import http
 
 from fastapi import APIRouter, Depends, HTTPException
+from psycopg2.errors import ForeignKeyViolation, UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -27,6 +28,7 @@ router = APIRouter(
     status_code=http.HTTPStatus.OK,
 )
 def get_dishes(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
+
     if is_cached('dish', 'all'):
         return get_cache('dish', 'all')
 
@@ -47,6 +49,7 @@ def get_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session = Depends(
         return get_cache('dish', dish_id)
 
     dish = crud.read_dish(menu_id, submenu_id, dish_id, db)
+
     if not dish:
         raise HTTPException(status_code=404, detail='dish not found')
 
@@ -61,22 +64,32 @@ def get_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session = Depends(
     status_code=http.HTTPStatus.CREATED,
 )
 def post_dish(menu_id: str, submenu_id: str, new_dish: scheme.DishCreate, db: Session = Depends(get_db)):
+
     try:
-        dish = crud.create_dish(menu_id, submenu_id, new_dish, db)
-        set_cache('dish', dish.id, dish)
+        new_dish_id = crud.create_dish(submenu_id, new_dish, db)
+    except IntegrityError as e:
+        if isinstance(e.orig, UniqueViolation):
+            raise HTTPException(
+                status_code=400, detail='Dish with that title already exists',
+            )
+        elif isinstance(e.orig, ForeignKeyViolation):
+            raise HTTPException(
+                status_code=400, detail='submenu not found',
+            )
+        else:
+            raise
 
-        # Чистим кэш для родительских элементов и получения списков элементов
-        clear_cache('dish', 'all')
-        clear_cache('submenu', submenu_id)
-        clear_cache('submenu', 'all')
-        clear_cache('menu', menu_id)
-        clear_cache('menu', 'all')
+    new_dish = crud.read_dish(menu_id, submenu_id, new_dish_id, db)
+    set_cache('dish', new_dish_id, new_dish)
 
-        return dish
-    except IntegrityError:
-        raise HTTPException(
-            status_code=400, detail='Dish with that title already exists.',
-        )
+    # Чистим кэш для родительских элементов и получения списков элементов
+    clear_cache('dish', 'all')
+    clear_cache('submenu', submenu_id)
+    clear_cache('submenu', 'all')
+    clear_cache('menu', menu_id)
+    clear_cache('menu', 'all')
+
+    return new_dish
 
 
 @router.patch(
@@ -86,15 +99,14 @@ def post_dish(menu_id: str, submenu_id: str, new_dish: scheme.DishCreate, db: Se
     status_code=http.HTTPStatus.OK,
 )
 def patch_dish(menu_id: str, submenu_id: str, dish_id: str, patch: scheme.DishUpdate, db: Session = Depends(get_db)):
+
     if not crud.read_dish(menu_id, submenu_id, dish_id, db):
         raise HTTPException(status_code=404, detail='dish not found')
 
     crud.update_dish(submenu_id, dish_id, patch, db)
     updated_dish = crud.read_dish(menu_id, submenu_id, dish_id, db)
-
     set_cache('dish', dish_id, updated_dish)
-    # чистим кэш списка всех блюд, т.к. в одном блюде меняется содержимое
-    clear_cache('dish', 'all')
+    clear_cache('dish', 'all')  # чистим кэш получения списка блюд
 
     return updated_dish
 
@@ -106,8 +118,10 @@ def patch_dish(menu_id: str, submenu_id: str, dish_id: str, patch: scheme.DishUp
     status_code=http.HTTPStatus.OK,
 )
 def delete_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session = Depends(get_db)):
+
     if not crud.read_dish(menu_id, submenu_id, dish_id, db):
         raise HTTPException(status_code=404, detail='dish not found')
+
     crud.delete_dish(submenu_id, dish_id, db)
     clear_cache('dish', dish_id)
 

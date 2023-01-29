@@ -1,6 +1,7 @@
 import http
 
 from fastapi import APIRouter, Depends, HTTPException
+from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -27,6 +28,7 @@ router = APIRouter(
     status_code=http.HTTPStatus.OK,
 )
 def get_menus(db: Session = Depends(get_db)):
+
     if is_cached('menu', 'all'):
         return get_cache('menu', 'all')
 
@@ -42,6 +44,7 @@ def get_menus(db: Session = Depends(get_db)):
     status_code=http.HTTPStatus.OK,
 )
 def get_menu(menu_id: str, db: Session = Depends(get_db)):
+
     if is_cached('menu', menu_id):
         return get_cache('menu', menu_id)
 
@@ -60,18 +63,22 @@ def get_menu(menu_id: str, db: Session = Depends(get_db)):
     summary='Создание меню',
     status_code=http.HTTPStatus.CREATED,
 )
-def post_menu(new_menu: scheme.MenuCreate, db: Session = Depends(get_db)):
+def post_menu(data: scheme.MenuCreate, db: Session = Depends(get_db)):
 
     try:
-        menu = crud.create_menu(new_menu, db)
-        set_cache('menu', menu.id, menu)
-        clear_cache('menu', 'all')  # чистим кэш получения списка меню
-        return menu
+        new_menu_id = crud.create_menu(data, db)
+    except IntegrityError as e:
+        if isinstance(e.orig, UniqueViolation):
+            raise HTTPException(
+                status_code=400, detail='Menu with that title already exists',
+            )
+        else:
+            raise
 
-    except IntegrityError:
-        raise HTTPException(
-            status_code=400, detail='Menu with that title already exists.',
-        )
+    new_menu = crud.read_menu(new_menu_id, db)
+    set_cache('menu', new_menu_id, new_menu)
+    clear_cache('menu', 'all')  # чистим кэш получения списка меню
+    return new_menu
 
 
 @router.patch(
