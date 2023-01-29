@@ -10,7 +10,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from restaurant_menu_app.database import Base
+from restaurant_menu_app.db.main_db.database import Base
 
 metadata = MetaData()
 

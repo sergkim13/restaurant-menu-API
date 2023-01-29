@@ -2,7 +2,7 @@ import json
 
 from fastapi.encoders import jsonable_encoder
 
-from .redis_storage import redis_client
+from .cache_settings import redis_client
 
 
 def get_cache(key_prefix, key_body):

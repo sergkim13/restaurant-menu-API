@@ -10,3 +10,6 @@ DB_NAME = os.environ.get('DB_NAME')
 DB_USER = os.environ.get('DB_USER')
 DB_PASS = os.environ.get('DB_PASS')
 DB_SERVICE = os.environ.get('DB_SERVICE')
+
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_DOCKER_HOST = os.environ.get('REDIS_DOCKER_HOST')

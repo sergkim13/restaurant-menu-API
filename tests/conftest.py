@@ -4,8 +4,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import create_database, database_exists
 
-from restaurant_menu_app.database import SQLALCHEMY_DATABASE_URL, Base
-from restaurant_menu_app.main import app, get_db
+from restaurant_menu_app.db.main_db.database import (
+    SQLALCHEMY_DATABASE_URL,
+    Base,
+    get_db,
+)
+from restaurant_menu_app.main import app
 
 
 @pytest.fixture(scope='session')

@@ -1,7 +1,8 @@
 import pytest
 
 # from .conftest import client, db
-from restaurant_menu_app import crud, schemas
+from restaurant_menu_app.db.main_db import crud
+from restaurant_menu_app.schemas import scheme
 
 # Data fixtures
 new_menu = {'title': 'Main menu', 'description': 'our main menu'}
@@ -27,25 +28,25 @@ dish_deleted = {'status': True, 'message': 'The dish has been deleted'}
 # CRUD fixtures
 @pytest.fixture
 def fixture_menu(db):
-    return crud.create_menu(schemas.MenuCreate(**new_menu), db)
+    return crud.create_menu(scheme.MenuCreate(**new_menu), db)
 
 
 @pytest.fixture
 def fixture_submenu(db):
-    menu = crud.create_menu(schemas.MenuCreate(**new_menu), db)
+    menu = crud.create_menu(scheme.MenuCreate(**new_menu), db)
     submenu = crud.create_submenu(
-        menu.id, schemas.SubmenuCreate(**new_submenu), db,
+        menu.id, scheme.SubmenuCreate(**new_submenu), db,
     )
     return menu.id, submenu
 
 
 @pytest.fixture
 def fixture_dish(db):
-    menu = crud.create_menu(schemas.MenuCreate(**new_menu), db)
+    menu = crud.create_menu(scheme.MenuCreate(**new_menu), db)
     submenu = crud.create_submenu(
-        menu.id, schemas.SubmenuCreate(**new_submenu), db,
+        menu.id, scheme.SubmenuCreate(**new_submenu), db,
     )
-    return menu.id, submenu.id, crud.create_dish(menu.id, submenu.id, schemas.DishCreate(**new_dish), db)
+    return menu.id, submenu.id, crud.create_dish(menu.id, submenu.id, scheme.DishCreate(**new_dish), db)
 
 
 def test_get_home(client):

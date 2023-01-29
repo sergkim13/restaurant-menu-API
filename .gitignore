@@ -7,3 +7,4 @@ coverage.xml
 dist/
 tempCodeRunnerFile.py
 .mypy_cache/
+*.rdb

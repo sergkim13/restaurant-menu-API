@@ -2,7 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER  # , DB_SERVICE
+from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
+
+# from config import DB_NAME, DB_PASS, DB_USER, DB_SERVICE
 
 # from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
@@ -23,6 +25,14 @@ Base = declarative_base()
 # Синхорнный движок
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # Асихнронный движок
 # engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)

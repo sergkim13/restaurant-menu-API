@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 from config import DB_HOST, DB_PORT, DB_NAME, DB_PASS, DB_USER, DB_SERVICE
 # from restaurant_menu_app.models import metadata
-from restaurant_menu_app.database import Base
+from restaurant_menu_app.db.main_db.database import Base
 
 
 # this is the Alembic Config object, which provides
