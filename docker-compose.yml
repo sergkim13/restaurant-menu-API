@@ -19,6 +19,8 @@ services:
     depends_on:
       postgres_db:
         condition: service_healthy
+      redis_cache:
+        condition: service_healthy
 
   postgres_db:
     container_name: postgres_db
@@ -39,6 +41,21 @@ services:
       - restaurant_menu_app_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis_cache:
+    container_name: redis_cache
+    image: redis:latest
+    expose:
+      - 6379
+    ports:
+      - "6379:6379"
+    networks:
+      - restaurant_menu_app_network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
