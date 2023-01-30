@@ -1,19 +1,9 @@
-import http
+from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
-from psycopg2.errors import UniqueViolation
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends
 
-from restaurant_menu_app.db.cache.cache_utils import (
-    clear_cache,
-    get_cache,
-    is_cached,
-    set_cache,
-)
-from restaurant_menu_app.db.main_db import crud
-from restaurant_menu_app.db.main_db.database import get_db
-from restaurant_menu_app.schemas import scheme
+from restaurant_menu_app.schemas.scheme import MenuCreate, MenuInfo, MenuUpdate, Message
+from restaurant_menu_app.services.menus import MenuService, get_menu_service
 
 router = APIRouter(
     prefix='/api/v1/menus',
@@ -23,96 +13,64 @@ router = APIRouter(
 
 @router.get(
     path='',
-    response_model=list[scheme.MenuInfo],
+    response_model=list[MenuInfo],
     summary='Получение списка всех меню',
-    status_code=http.HTTPStatus.OK,
+    status_code=HTTPStatus.OK,
 )
-def get_menus(db: Session = Depends(get_db)):
-
-    if is_cached('menu', 'all'):
-        return get_cache('menu', 'all')
-
-    menus = crud.read_menus(db)
-    set_cache('menu', 'all', menus)
-    return menus
+def get_menus(
+    menu_service: MenuService = Depends(get_menu_service),
+) -> list[MenuInfo]:
+    return menu_service.get_list()
 
 
 @router.get(
     path='/{menu_id}',
-    response_model=scheme.MenuInfo,
+    response_model=MenuInfo,
     summary='Получение информации о меню',
-    status_code=http.HTTPStatus.OK,
+    status_code=HTTPStatus.OK,
 )
-def get_menu(menu_id: str, db: Session = Depends(get_db)):
-
-    if is_cached('menu', menu_id):
-        return get_cache('menu', menu_id)
-
-    menu = crud.read_menu(menu_id, db)
-
-    if not menu:
-        raise HTTPException(status_code=404, detail='menu not found')
-
-    set_cache('menu', menu_id, menu)
-    return menu
+def get_menu(
+    menu_id: str,
+    menu_service: MenuService = Depends(get_menu_service),
+) -> MenuInfo:
+    return menu_service.get_info(menu_id)
 
 
 @router.post(
     path='',
-    response_model=scheme.MenuInfo,
+    response_model=MenuInfo,
     summary='Создание меню',
-    status_code=http.HTTPStatus.CREATED,
+    status_code=HTTPStatus.CREATED,
 )
-def post_menu(data: scheme.MenuCreate, db: Session = Depends(get_db)):
-
-    try:
-        new_menu_id = crud.create_menu(data, db)
-    except IntegrityError as e:
-        if isinstance(e.orig, UniqueViolation):
-            raise HTTPException(
-                status_code=400, detail='Menu with that title already exists',
-            )
-        else:
-            raise
-
-    new_menu = crud.read_menu(new_menu_id, db)
-    set_cache('menu', new_menu_id, new_menu)
-    clear_cache('menu', 'all')  # чистим кэш получения списка меню
-    return new_menu
+def post_menu(
+    new_menu: MenuCreate,
+    menu_service: MenuService = Depends(get_menu_service),
+) -> MenuInfo:
+    return menu_service.create(new_menu)
 
 
 @router.patch(
     path='/{menu_id}',
-    response_model=scheme.MenuInfo,
+    response_model=MenuInfo,
     summary='Обновление меню',
-    status_code=http.HTTPStatus.OK,
+    status_code=HTTPStatus.OK,
 )
-def patch_menu(menu_id: str, patch: scheme.MenuUpdate, db: Session = Depends(get_db)):
-
-    if not crud.read_menu(menu_id, db):
-        raise HTTPException(status_code=404, detail='menu not found')
-
-    crud.update_menu(menu_id, patch, db)
-    updated_menu = crud.read_menu(menu_id, db)
-    set_cache('menu', menu_id, updated_menu)
-    clear_cache('menu', 'all')  # чистим кэш получения списка меню
-
-    return updated_menu
+def patch_menu(
+    menu_id: str,
+    patch: MenuUpdate,
+    menu_service: MenuService = Depends(get_menu_service),
+) -> MenuInfo:
+    return menu_service.update(menu_id, patch)
 
 
 @router.delete(
     path='/{menu_id}',
-    response_model=scheme.Message,
+    response_model=Message,
     summary='Удаление меню',
-    status_code=http.HTTPStatus.OK,
+    status_code=HTTPStatus.OK,
 )
-def delete_menu(menu_id: str, db: Session = Depends(get_db)):
-
-    if not crud.read_menu(menu_id, db):
-        raise HTTPException(status_code=404, detail='menu not found')
-
-    crud.delete_menu(menu_id, db)
-    clear_cache('menu', menu_id)
-    clear_cache('menu', 'all')  # чистим кэш получения списка меню
-    message = {'status': True, 'message': 'The menu has been deleted'}
-    return message
+def delete_menu(
+    menu_id: str,
+    menu_service: MenuService = Depends(get_menu_service),
+) -> Message:
+    return menu_service.delete(menu_id)

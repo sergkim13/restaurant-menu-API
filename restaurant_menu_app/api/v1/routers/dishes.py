@@ -1,19 +1,9 @@
-import http
+from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
-from psycopg2.errors import ForeignKeyViolation, UniqueViolation
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends
 
-from restaurant_menu_app.db.cache.cache_utils import (
-    clear_cache,
-    get_cache,
-    is_cached,
-    set_cache,
-)
-from restaurant_menu_app.db.main_db import crud
-from restaurant_menu_app.db.main_db.database import get_db
-from restaurant_menu_app.schemas import scheme
+from restaurant_menu_app.schemas.scheme import DishCreate, DishInfo, DishUpdate, Message
+from restaurant_menu_app.services.dishes import DishService, get_dish_service
 
 router = APIRouter(
     prefix='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
@@ -23,114 +13,74 @@ router = APIRouter(
 
 @router.get(
     path='',
-    response_model=list[scheme.DishInfo],
+    response_model=list[DishInfo],
     summary='Просмотр списка блюд',
-    status_code=http.HTTPStatus.OK,
+    status_code=HTTPStatus.OK,
 )
-def get_dishes(menu_id: str, submenu_id: str, db: Session = Depends(get_db)):
-
-    if is_cached('dish', 'all'):
-        return get_cache('dish', 'all')
-
-    dishes = crud.read_dishes(menu_id, submenu_id, db)
-    set_cache('dish', 'all', dishes)
-    return dishes
+def get_dishes(
+    menu_id: str,
+    submenu_id: str,
+    dish_service: DishService = Depends(get_dish_service),
+) -> list[DishInfo]:
+    return dish_service.get_list(menu_id, submenu_id)
 
 
 @router.get(
     path='/{dish_id}',
-    response_model=scheme.DishInfo,
+    response_model=DishInfo,
     summary='Просмотр информации о блюде',
-    status_code=http.HTTPStatus.OK,
+    status_code=HTTPStatus.OK,
 )
-def get_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session = Depends(get_db)):
-
-    if is_cached('dish', dish_id):
-        return get_cache('dish', dish_id)
-
-    dish = crud.read_dish(menu_id, submenu_id, dish_id, db)
-
-    if not dish:
-        raise HTTPException(status_code=404, detail='dish not found')
-
-    set_cache('dish', dish_id, dish)
-    return dish
+def get_dish(
+    menu_id: str,
+    submenu_id: str,
+    dish_id: str,
+    dish_service: DishService = Depends(get_dish_service),
+) -> DishInfo:
+    return dish_service.get_info(menu_id, submenu_id, dish_id)
 
 
 @router.post(
     path='',
-    response_model=scheme.DishInfo,
+    response_model=DishInfo,
     summary='Создание блюда',
-    status_code=http.HTTPStatus.CREATED,
+    status_code=HTTPStatus.CREATED,
 )
-def post_dish(menu_id: str, submenu_id: str, new_dish: scheme.DishCreate, db: Session = Depends(get_db)):
-
-    try:
-        new_dish_id = crud.create_dish(submenu_id, new_dish, db)
-    except IntegrityError as e:
-        if isinstance(e.orig, UniqueViolation):
-            raise HTTPException(
-                status_code=400, detail='Dish with that title already exists',
-            )
-        elif isinstance(e.orig, ForeignKeyViolation):
-            raise HTTPException(
-                status_code=400, detail='submenu not found',
-            )
-        else:
-            raise
-
-    new_dish = crud.read_dish(menu_id, submenu_id, new_dish_id, db)
-    set_cache('dish', new_dish_id, new_dish)
-
-    # Чистим кэш для родительских элементов и получения списков элементов
-    clear_cache('dish', 'all')
-    clear_cache('submenu', submenu_id)
-    clear_cache('submenu', 'all')
-    clear_cache('menu', menu_id)
-    clear_cache('menu', 'all')
-
-    return new_dish
+def post_dish(
+    menu_id: str,
+    submenu_id: str,
+    new_dish: DishCreate,
+    dish_service: DishService = Depends(get_dish_service),
+) -> DishInfo:
+    return dish_service.create(menu_id, submenu_id, new_dish)
 
 
 @router.patch(
     path='/{dish_id}',
-    response_model=scheme.DishInfo,
+    response_model=DishInfo,
     summary='Обновление блюда',
-    status_code=http.HTTPStatus.OK,
+    status_code=HTTPStatus.OK,
 )
-def patch_dish(menu_id: str, submenu_id: str, dish_id: str, patch: scheme.DishUpdate, db: Session = Depends(get_db)):
-
-    if not crud.read_dish(menu_id, submenu_id, dish_id, db):
-        raise HTTPException(status_code=404, detail='dish not found')
-
-    crud.update_dish(submenu_id, dish_id, patch, db)
-    updated_dish = crud.read_dish(menu_id, submenu_id, dish_id, db)
-    set_cache('dish', dish_id, updated_dish)
-    clear_cache('dish', 'all')  # чистим кэш получения списка блюд
-
-    return updated_dish
+def patch_dish(
+    menu_id: str,
+    submenu_id: str,
+    dish_id: str,
+    patch: DishUpdate,
+    dish_service: DishService = Depends(get_dish_service),
+) -> DishInfo:
+    return dish_service.update(menu_id, submenu_id, dish_id, patch)
 
 
 @router.delete(
     path='/{dish_id}',
-    response_model=scheme.Message,
+    response_model=Message,
     summary='Удаление блюда',
-    status_code=http.HTTPStatus.OK,
+    status_code=HTTPStatus.OK,
 )
-def delete_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session = Depends(get_db)):
-
-    if not crud.read_dish(menu_id, submenu_id, dish_id, db):
-        raise HTTPException(status_code=404, detail='dish not found')
-
-    crud.delete_dish(submenu_id, dish_id, db)
-    clear_cache('dish', dish_id)
-
-    # Чистим кэш для родительских элементов и получения списков элементов
-    clear_cache('dish', 'all')
-    clear_cache('submenu', submenu_id)
-    clear_cache('submenu', 'all')
-    clear_cache('menu', menu_id)
-    clear_cache('menu', 'all')
-
-    message = {'status': True, 'message': 'The dish has been deleted'}
-    return message
+def delete_dish(
+    menu_id: str,
+    submenu_id: str,
+    dish_id: str,
+    dish_service: DishService = Depends(get_dish_service),
+) -> Message:
+    return dish_service.delete(menu_id, submenu_id, dish_id)
