@@ -1,5 +1,7 @@
 import pytest
 
+from restaurant_menu_app.db.cache.cache_settings import redis_client
+
 # from .conftest import client, db
 from restaurant_menu_app.db.main_db import crud
 from restaurant_menu_app.schemas import scheme
@@ -23,6 +25,11 @@ submenu_not_found = {'detail': 'submenu not found'}
 submenu_deleted = {'status': True, 'message': 'The submenu has been deleted'}
 dish_not_found = {'detail': 'dish not found'}
 dish_deleted = {'status': True, 'message': 'The dish has been deleted'}
+
+
+@pytest.fixture(scope='function', autouse=True)
+def clear_cache():
+    redis_client.flushall()
 
 
 # CRUD fixtures

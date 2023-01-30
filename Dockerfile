@@ -25,6 +25,6 @@ RUN pip install --no-cache-dir --upgrade -r /src/requirements.txt
 COPY restaurant_menu_app/ /src/restaurant_menu_app/
 COPY migrations/ /src/migrations/
 COPY alembic.ini /src/
-COPY tests/ /src/
+COPY tests/ /src/tests/
 COPY docker_env/.env /src/.env
 COPY config.py /src/

@@ -21,7 +21,3 @@ app.include_router(dish_router)
 )
 def home():
     return 'Welcome to our restaurant!'
-
-
-# if __name__ == '__main__':
-#     start_app()

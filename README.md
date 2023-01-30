@@ -17,7 +17,7 @@ Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker, Redis.
 3. Type `make compose-test` for running tests in docker container.
 4. For checking `pre-commit hooks`:
     - `pip install --user pre-commit`
-    - `pre-commit pre-commit run --all-files`
+    - `pre-commit run --all-files`
 
 Pre-commit hooks demo:
 [![asciicast](https://asciinema.org/a/jrqJF7T6zoqNpc1poQD1OKa0C.svg)](https://asciinema.org/a/jrqJF7T6zoqNpc1poQD1OKa0C)
