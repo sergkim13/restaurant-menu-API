@@ -13,8 +13,8 @@ Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker, Redis.
 
 ### Install:
 1. Clone repository: `https://github.com/sergkim13/restaurant_menu_FastAPI.git`
-2. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `compose-stop` to stop app container. 
-3. Type `make compose-test` for running tests in docker container.
+2. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `make stop` to stop app container. 
+3. Type `make compose-test` for running tests in docker container. Type `make stop-test` to stop app container.
 4. For checking `pre-commit hooks`:
     - `pip install --user pre-commit`
     - `pre-commit run --all-files`
