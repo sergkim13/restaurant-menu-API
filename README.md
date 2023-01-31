@@ -15,12 +15,12 @@ Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker, Redis.
 1. Clone repository: `https://github.com/sergkim13/restaurant_menu_FastAPI.git`
 2. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `make stop` to stop app container. 
 3. Type `make compose-test` for running tests in docker container. Type `make stop-test` to stop app container.
-4. For checking `pre-commit hooks`:
-    - `pip install --user pre-commit`
-    - `pre-commit run --all-files`
+4. For checking `pre-commit hooks` you need `Poetry` and install dependencies:
+    - `make install`
+    - `make hooks`
 
 Pre-commit hooks demo:
-[![asciicast](https://asciinema.org/a/jrqJF7T6zoqNpc1poQD1OKa0C.svg)](https://asciinema.org/a/jrqJF7T6zoqNpc1poQD1OKa0C)
+[![asciicast](https://asciinema.org/a/EiyQ6mOfD3QHo6r5atuzNcl1P.svg)](https://asciinema.org/a/EiyQ6mOfD3QHo6r5atuzNcl1P)
 __________
 ### **Task description (stage №3)**.
 В этом домашнем задании надо:
