@@ -44,30 +44,28 @@ def read_submenu(menu_id: str, submenu_id: str, db: Session):
     ).group_by(model.Submenu.id).first()
 
 
-def read_submenu_by_title(menu_id: str, new_submenu_title: str, db: Session):
-    return db.query(model.Submenu).filter(
-        model.Submenu.title == new_submenu_title,
-        model.Submenu.menu_id == menu_id,
-    ).first()
-
-
-def create_submenu(
-        menu_id: str, data: scheme.SubmenuCreate, db: Session,
-):
+def create_submenu(menu_id: str, data: scheme.SubmenuCreate, db: Session):
     new_submenu = model.Submenu(menu_id=menu_id, **data.dict())
     db.add(new_submenu)
     db.commit()
     db.refresh(new_submenu)
-    return new_submenu.id
+    return new_submenu
 
 
 def update_submenu(
-        menu_id: str, submenu_id: str,
-        patch: scheme.SubmenuUpdate, db: Session,
+        menu_id: str,
+        submenu_id: str,
+        patch: scheme.SubmenuUpdate,
+        db: Session,
 ):
+    submenu_to_update = read_submenu(menu_id, submenu_id, db)
+    values = patch.dict(exclude_unset=True)
+    for key, value in values.items():
+        if not value:
+            values[key] = submenu_to_update[key]
     db.query(model.Submenu).filter(
         model.Submenu.id == submenu_id, model.Submenu.menu_id == menu_id,
-    ).update(patch.dict())
+    ).update(values)
     db.commit()
 
 

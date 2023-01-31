@@ -45,25 +45,23 @@ def read_menu(menu_id: str, db: Session):
     ).group_by(model.Menu.id).first()
 
 
-def read_menu_by_title(menu_title: str, db: Session):
-    return db.query(model.Menu).filter(
-        model.Menu.title == menu_title,
-    ).first()
-
-
 def create_menu(data: scheme.MenuCreate, db: Session):
     new_menu = model.Menu(**data.dict())
     db.add(new_menu)
     db.commit()
     db.refresh(new_menu)
-    return new_menu.id
-    # return read_menu(menu.id, db)
+    return new_menu
 
 
 def update_menu(menu_id: str, patch: scheme.MenuUpdate, db: Session):
+    menu_to_update = read_menu(menu_id, db)
+    values = patch.dict(exclude_unset=True)
+    for key, value in values.items():
+        if not value:
+            values[key] = menu_to_update[key]
     db.query(model.Menu).filter(
         model.Menu.id == menu_id,
-    ).update(patch.dict())
+    ).update(values)
     db.commit()
 
 

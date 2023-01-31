@@ -53,7 +53,7 @@ class SubmenuService():
         '''Создать подменю.'''
 
         try:
-            new_submenu_id = crud.create_submenu(menu_id, data, self.db)
+            new_submenu = crud.create_submenu(menu_id, data, self.db)
         except IntegrityError as e:
             if isinstance(e.orig, UniqueViolation):
                 raise HTTPException(
@@ -66,13 +66,13 @@ class SubmenuService():
             else:
                 raise
 
-        new_submenu = crud.read_submenu(menu_id, new_submenu_id, self.db)
-        set_cache('submenu', new_submenu_id, new_submenu)
+        created_submenu = crud.read_submenu(menu_id, new_submenu.id, self.db)
+        set_cache('submenu', new_submenu.id, created_submenu)
         # Чистим кэш для родительских элементов и получения списков элементов
         clear_cache('submenu', 'all')
         clear_cache('menu', menu_id)
         clear_cache('menu', 'all')
-        return new_submenu
+        return created_submenu
 
     def update(self, menu_id: str, submenu_id: str, patch: SubmenuUpdate) -> SubmenuInfo:
         '''Обновить подменю.'''

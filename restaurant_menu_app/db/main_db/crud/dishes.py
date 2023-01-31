@@ -26,40 +26,34 @@ def read_dish(menu_id: str, submenu_id: str, dish_id: str, db: Session):
     ).first()
 
 
-def read_dish_by_title(
-        menu_id: str, submenu_id: str, new_dish_title: str, db: Session,
-):
-
-    return db.query(model.Dish).join(
-        model.Dish.submenu,
-    ).join(
-        model.Submenu.main_menu,
-    ).filter(
-        model.Menu.id == menu_id,
-        model.Dish.submenu_id == submenu_id,
-        model.Dish.title == new_dish_title,
-    ).first()
-
-
 def create_dish(
         submenu_id: str,
-        data: scheme.DishCreate, db: Session,
+        data: scheme.DishCreate,
+        db: Session,
 ):
     new_dish = model.Dish(submenu_id=submenu_id, **data.dict())
     db.add(new_dish)
     db.commit()
     db.refresh(new_dish)
-    return new_dish.id
+    return new_dish
 
 
 def update_dish(
-        submenu_id: str, dish_id: str,
-        patch: scheme.DishUpdate, db: Session,
+        menu_id: str,
+        submenu_id: str,
+        dish_id: str,
+        patch: scheme.DishUpdate,
+        db: Session,
 ):
+    dish_to_update = read_dish(menu_id, submenu_id, dish_id, db)
+    values = patch.dict(exclude_unset=True)
+    for key, value in values.items():
+        if not value:
+            values[key] = dish_to_update[key]
     db.query(model.Dish).filter(
         model.Dish.id == dish_id,
         model.Dish.submenu_id == submenu_id,
-    ).update(patch.dict())
+    ).update(values)
     db.commit()
 
 

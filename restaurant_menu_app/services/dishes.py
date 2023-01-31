@@ -48,7 +48,7 @@ class DishService():
         '''Создать блюдо.'''
 
         try:
-            new_dish_id = crud.create_dish(submenu_id, data, self.db)
+            new_dish = crud.create_dish(submenu_id, data, self.db)
         except IntegrityError as e:
             if isinstance(e.orig, UniqueViolation):
                 raise HTTPException(
@@ -61,15 +61,17 @@ class DishService():
             else:
                 raise
 
-        new_dish = crud.read_dish(menu_id, submenu_id, new_dish_id, self.db)
-        set_cache('dish', new_dish_id, new_dish)
+        created_dish = crud.read_dish(
+            menu_id, submenu_id, new_dish.id, self.db,
+        )
+        set_cache('dish', new_dish.id, created_dish)
         # Чистим кэш для родительских элементов и получения списков элементов
         clear_cache('dish', 'all')
         clear_cache('submenu', submenu_id)
         clear_cache('submenu', 'all')
         clear_cache('menu', menu_id)
         clear_cache('menu', 'all')
-        return new_dish
+        return created_dish
 
     def update(self, menu_id: str, submenu_id: str, dish_id: str, patch: DishUpdate) -> DishInfo:
         '''Обновить блюдо.'''
@@ -79,7 +81,7 @@ class DishService():
                 status_code=HTTPStatus.NOT_FOUND, detail='dish not found',
             )
 
-        crud.update_dish(submenu_id, dish_id, patch, self.db)
+        crud.update_dish(menu_id, submenu_id, dish_id, patch, self.db)
         updated_dish = crud.read_dish(menu_id, submenu_id, dish_id, self.db)
         set_cache('dish', dish_id, updated_dish)
         clear_cache('dish', 'all')  # чистим кэш получения списка блюд

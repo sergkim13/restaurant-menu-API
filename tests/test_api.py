@@ -1,8 +1,6 @@
 import pytest
 
 from restaurant_menu_app.db.cache.cache_settings import redis_client
-
-# from .conftest import client, db
 from restaurant_menu_app.db.main_db import crud
 from restaurant_menu_app.schemas import scheme
 
@@ -35,30 +33,25 @@ def clear_cache():
 # CRUD fixtures
 @pytest.fixture
 def fixture_menu(db):
-    menu_id = crud.create_menu(scheme.MenuCreate(**new_menu), db)
-    menu = crud.read_menu(menu_id, db)
-    return menu
+    menu = crud.create_menu(scheme.MenuCreate(**new_menu), db)
+    return crud.read_menu(menu.id, db)
 
 
 @pytest.fixture
-def fixture_submenu(db):
-    menu_id = crud.create_menu(scheme.MenuCreate(**new_menu), db)
-    submenu_id = crud.create_submenu(
-        menu_id, scheme.SubmenuCreate(**new_submenu), db,
+def fixture_submenu(db, fixture_menu):
+    menu = fixture_menu
+    submenu = crud.create_submenu(
+        menu.id, scheme.SubmenuCreate(**new_submenu), db,
     )
-    submenu = crud.read_submenu(menu_id, submenu_id, db)
-    return menu_id, submenu
+    return menu.id, crud.read_submenu(menu.id, submenu.id, db)
 
 
 @pytest.fixture
-def fixture_dish(db):
-    menu_id = crud.create_menu(scheme.MenuCreate(**new_menu), db)
-    submenu_id = crud.create_submenu(
-        menu_id, scheme.SubmenuCreate(**new_submenu), db,
-    )
-    dish_id = crud.create_dish(submenu_id, scheme.DishCreate(**new_dish), db)
-    dish = crud.read_dish(menu_id, submenu_id, dish_id, db)
-    return menu_id, submenu_id, dish
+def fixture_dish(db, fixture_menu, fixture_submenu):
+    menu = fixture_menu
+    submenu = fixture_submenu[1]
+    dish = crud.create_dish(submenu.id, scheme.DishCreate(**new_dish), db)
+    return menu.id, submenu.id, crud.read_dish(menu.id, submenu.id, dish.id, db)
 
 
 def test_get_home(client):

@@ -38,8 +38,9 @@ class MenuCreate(MenuBase):
         }
 
 
-class MenuUpdate(MenuBase):
-    pass
+class MenuUpdate(BaseModel):
+    title: str | None
+    description: str | None
 
     class Config:
         orm_mode = True
@@ -86,8 +87,9 @@ class SubmenuCreate(SubmenuBase):
         }
 
 
-class SubmenuUpdate(SubmenuBase):
-    pass
+class SubmenuUpdate(BaseModel):
+    title: str | None
+    description: str | None
 
     class Config:
         orm_mode = True
@@ -139,8 +141,10 @@ class DishCreate(DishBase):
         }
 
 
-class DishUpdate(DishBase):
-    pass
+class DishUpdate(BaseModel):
+    title: str | None
+    description: str | None
+    price: float | None
 
     class Config:
         orm_mode = True

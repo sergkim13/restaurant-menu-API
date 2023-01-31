@@ -48,7 +48,7 @@ class MenuService():
         '''Cоздать меню.'''
 
         try:
-            new_menu_id = crud.create_menu(data, self.db)
+            new_menu = crud.create_menu(data, self.db)
         except IntegrityError as e:
             if isinstance(e.orig, UniqueViolation):
                 raise HTTPException(
@@ -57,10 +57,10 @@ class MenuService():
             else:
                 raise
 
-        new_menu = crud.read_menu(new_menu_id, self.db)
-        set_cache('menu', new_menu_id, new_menu)
+        created_menu = crud.read_menu(new_menu.id, self.db)
+        set_cache('menu', new_menu.id, created_menu)
         clear_cache('menu', 'all')  # чистим кэш получения списка меню
-        return new_menu
+        return created_menu
 
     def update(self, menu_id: str, patch: MenuUpdate) -> MenuInfo:
         '''Обновить меню.'''

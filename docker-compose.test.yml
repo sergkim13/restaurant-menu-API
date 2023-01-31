@@ -5,6 +5,8 @@ services:
     container_name: restaurant_menu_app
     env_file:
       - .docker-test.env
+    environment:
+      DB_NAME: ${TEST_DB_NAME}
     build:
       context: .
       dockerfile: Dockerfile
@@ -29,7 +31,7 @@ services:
     env_file:
       - .docker-test.env
     environment:
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_DB: ${TEST_DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
     expose:
@@ -39,7 +41,7 @@ services:
     networks:
       - test_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${TEST_DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,8 +49,6 @@ services:
   test_redis_db:
       container_name: test_redis_db
       image: redis:latest
-      environment:
-        REDIS_DB: ${REDIS_DB}
       expose:
         - 6379
       ports:
