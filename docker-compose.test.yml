@@ -3,6 +3,8 @@ version: '3.8'
 services:
   restaurant_menu_app:
     container_name: restaurant_menu_app
+    env_file:
+      - .docker-test.env
     build:
       context: .
       dockerfile: Dockerfile
@@ -14,18 +16,18 @@ services:
     networks:
       - test_network
     depends_on:
-      postgres_db:
+      test_postgres_db:
         condition: service_healthy
-      redis_db:
+      test_redis_db:
         condition: service_healthy
   
-  postgres_db:
-    container_name: postgres_db
+  test_postgres_db:
+    container_name: test_postgres_db
     image: postgres:15.1-alpine
     volumes:
       - test-db-data:/var/lib/postgresql/data/
     env_file:
-      - .env
+      - .docker-test.env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -42,9 +44,11 @@ services:
       timeout: 5s
       retries: 5
 
-  redis_db:
-      container_name: redis_db
+  test_redis_db:
+      container_name: test_redis_db
       image: redis:latest
+      environment:
+        REDIS_DB: ${REDIS_DB}
       expose:
         - 6379
       ports:

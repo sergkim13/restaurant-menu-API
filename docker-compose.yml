@@ -3,6 +3,8 @@ version: '3.8'
 services:
   restaurant_menu_app:
     container_name: restaurant_menu_app
+    env_file:
+      - .docker.env
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,7 +15,7 @@ services:
         uvicorn restaurant_menu_app.main:app --host 0.0.0.0 --reload
       "
     networks:
-      - restaurant_menu_app_network
+      - prod_network
     ports:
       - "8000:8000"
     depends_on:
@@ -28,7 +30,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/
     env_file:
-      - docker_env/.env
+      - .docker.env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -38,7 +40,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - restaurant_menu_app_network
+      - prod_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
@@ -53,7 +55,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - restaurant_menu_app_network
+      - prod_network
     healthcheck:
       test: ["CMD-SHELL", "redis-cli", "ping"]
       interval: 10s
@@ -61,8 +63,8 @@ services:
       retries: 5
 
 networks:
-  restaurant_menu_app_network:
-    name: restaurant_menu_app_network
+  prod_network:
+    name: prod_network
 
 volumes:
   db-data:

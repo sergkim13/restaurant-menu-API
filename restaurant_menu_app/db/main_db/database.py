@@ -9,17 +9,12 @@ from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
 # from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 
-# Локальная синхронная база
+# Cинхронная база
 SQLALCHEMY_DATABASE_URL = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
-# Локальная асинхронная база
+# Асинхронная база (переделать на асинхрон)
 # SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-# База для контейнеров
-# SQLALCHEMY_DATABASE_URL = f'postgresql://{DB_USER}:{DB_PASS}@{DB_SERVICE}/{DB_NAME}'
-
-# Асинхронная база для контейнеров
-# SQLALCHEMY_DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_SERVICE}/{DB_NAME}'
 Base = declarative_base()
 
 # Синхорнный движок

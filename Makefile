@@ -15,13 +15,16 @@ lint:
 	poetry run flake8 restaurant_menu_app
 
 compose:
-	docker compose up -d
+	docker compose --env-file .docker.env up -d
 
-compose-stop:
-	docker compose down
+stop:
+	docker compose --env-file .docker.env down
 
 compose-test:
-	docker compose -f docker-compose.test.yml -p testing up -d
+	docker compose --env-file .docker-test.env -f docker-compose.test.yml -p testing up -d
+
+stop-test:
+	docker compose --env-file .docker-test.env -f docker-compose.test.yml -p testing down
 
 hooks:
 	poetry run pre-commit run --all-files

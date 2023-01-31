@@ -2,7 +2,7 @@ import json
 
 from fastapi.encoders import jsonable_encoder
 
-from .cache_settings import redis_client
+from .cache_settings import EXPIRE_TIME, redis_client
 
 
 def get_cache(key_prefix, key_body):
@@ -14,7 +14,7 @@ def get_cache(key_prefix, key_body):
 def set_cache(key_prefix, key_body, value):
     key = generate_key(key_prefix, key_body)
     value = json.dumps(jsonable_encoder(value))
-    redis_client.set(key, value)
+    redis_client.set(key, value, ex=EXPIRE_TIME)
 
 
 def clear_cache(key_prefix, key_body):

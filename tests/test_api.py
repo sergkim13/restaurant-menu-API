@@ -29,7 +29,7 @@ dish_deleted = {'status': True, 'message': 'The dish has been deleted'}
 
 @pytest.fixture(scope='function', autouse=True)
 def clear_cache():
-    redis_client.flushall()
+    redis_client.flushdb()
 
 
 # CRUD fixtures
