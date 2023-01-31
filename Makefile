@@ -24,7 +24,7 @@ compose-test:
 	docker compose --env-file .docker-test.env -f docker-compose.test.yml -p testing up -d
 
 stop-test:
-	docker compose --env-file .docker.env -f docker-compose.test.yml -p testing down
+	docker compose --env-file .docker-test.env -f docker-compose.test.yml -p testing down
 
 hooks:
 	poetry run pre-commit run --all-files
