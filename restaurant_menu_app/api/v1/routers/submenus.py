@@ -22,11 +22,11 @@ router = APIRouter(
     summary='Просмотр списка подменю',
     status_code=HTTPStatus.OK,
 )
-def get_submenus(
+async def get_submenus(
     menu_id: str,
     submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> list[SubmenuInfo]:
-    return submenu_service.get_list(menu_id)
+    return await submenu_service.get_list(menu_id)
 
 
 @router.get(
@@ -35,12 +35,12 @@ def get_submenus(
     summary='Просмотр информации о подменю',
     status_code=HTTPStatus.OK,
 )
-def get_submenu(
+async def get_submenu(
     menu_id: str,
     submenu_id: str,
     submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> SubmenuInfo:
-    return submenu_service.get_info(menu_id, submenu_id)
+    return await submenu_service.get_info(menu_id, submenu_id)
 
 
 @router.post(
@@ -49,13 +49,13 @@ def get_submenu(
     summary='Создание подменю',
     status_code=HTTPStatus.CREATED,
 )
-def post_submenu(
+async def post_submenu(
     menu_id: str,
     new_submenu: SubmenuCreate,
     submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> SubmenuInfo:
 
-    return submenu_service.create(menu_id, new_submenu)
+    return await submenu_service.create(menu_id, new_submenu)
 
 
 @router.patch(
@@ -64,13 +64,13 @@ def post_submenu(
     summary='Обновление подменю',
     status_code=HTTPStatus.OK,
 )
-def patch_submenu(
+async def patch_submenu(
     menu_id: str,
     submenu_id: str,
     patch: SubmenuUpdate,
     submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> SubmenuInfo:
-    return submenu_service.update(menu_id, submenu_id, patch)
+    return await submenu_service.update(menu_id, submenu_id, patch)
 
 
 @router.delete(
@@ -79,9 +79,9 @@ def patch_submenu(
     summary='Удаление подменю',
     status_code=HTTPStatus.OK,
 )
-def delete_submenu(
+async def delete_submenu(
     menu_id: str,
     submenu_id: str,
     submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> Message:
-    return submenu_service.delete(menu_id, submenu_id)
+    return await submenu_service.delete(menu_id, submenu_id)

@@ -17,12 +17,12 @@ router = APIRouter(
     summary='Просмотр списка блюд',
     status_code=HTTPStatus.OK,
 )
-def get_dishes(
+async def get_dishes(
     menu_id: str,
     submenu_id: str,
     dish_service: DishService = Depends(get_dish_service),
 ) -> list[DishInfo]:
-    return dish_service.get_list(menu_id, submenu_id)
+    return await dish_service.get_list(menu_id, submenu_id)
 
 
 @router.get(
@@ -31,13 +31,13 @@ def get_dishes(
     summary='Просмотр информации о блюде',
     status_code=HTTPStatus.OK,
 )
-def get_dish(
+async def get_dish(
     menu_id: str,
     submenu_id: str,
     dish_id: str,
     dish_service: DishService = Depends(get_dish_service),
 ) -> DishInfo:
-    return dish_service.get_info(menu_id, submenu_id, dish_id)
+    return await dish_service.get_info(menu_id, submenu_id, dish_id)
 
 
 @router.post(
@@ -46,13 +46,13 @@ def get_dish(
     summary='Создание блюда',
     status_code=HTTPStatus.CREATED,
 )
-def post_dish(
+async def post_dish(
     menu_id: str,
     submenu_id: str,
     new_dish: DishCreate,
     dish_service: DishService = Depends(get_dish_service),
 ) -> DishInfo:
-    return dish_service.create(menu_id, submenu_id, new_dish)
+    return await dish_service.create(menu_id, submenu_id, new_dish)
 
 
 @router.patch(
@@ -61,14 +61,14 @@ def post_dish(
     summary='Обновление блюда',
     status_code=HTTPStatus.OK,
 )
-def patch_dish(
+async def patch_dish(
     menu_id: str,
     submenu_id: str,
     dish_id: str,
     patch: DishUpdate,
     dish_service: DishService = Depends(get_dish_service),
 ) -> DishInfo:
-    return dish_service.update(menu_id, submenu_id, dish_id, patch)
+    return await dish_service.update(menu_id, submenu_id, dish_id, patch)
 
 
 @router.delete(
@@ -77,10 +77,10 @@ def patch_dish(
     summary='Удаление блюда',
     status_code=HTTPStatus.OK,
 )
-def delete_dish(
+async def delete_dish(
     menu_id: str,
     submenu_id: str,
     dish_id: str,
     dish_service: DishService = Depends(get_dish_service),
 ) -> Message:
-    return dish_service.delete(menu_id, submenu_id, dish_id)
+    return await dish_service.delete(menu_id, submenu_id, dish_id)

@@ -17,10 +17,10 @@ router = APIRouter(
     summary='Получение списка всех меню',
     status_code=HTTPStatus.OK,
 )
-def get_menus(
+async def get_menus(
     menu_service: MenuService = Depends(get_menu_service),
 ) -> list[MenuInfo]:
-    return menu_service.get_list()
+    return await menu_service.get_list()
 
 
 @router.get(
@@ -29,11 +29,11 @@ def get_menus(
     summary='Получение информации о меню',
     status_code=HTTPStatus.OK,
 )
-def get_menu(
+async def get_menu(
     menu_id: str,
     menu_service: MenuService = Depends(get_menu_service),
 ) -> MenuInfo:
-    return menu_service.get_info(menu_id)
+    return await menu_service.get_info(menu_id)
 
 
 @router.post(
@@ -42,11 +42,11 @@ def get_menu(
     summary='Создание меню',
     status_code=HTTPStatus.CREATED,
 )
-def post_menu(
+async def post_menu(
     new_menu: MenuCreate,
     menu_service: MenuService = Depends(get_menu_service),
 ) -> MenuInfo:
-    return menu_service.create(new_menu)
+    return await menu_service.create(new_menu)
 
 
 @router.patch(
@@ -55,12 +55,12 @@ def post_menu(
     summary='Обновление меню',
     status_code=HTTPStatus.OK,
 )
-def patch_menu(
+async def patch_menu(
     menu_id: str,
     patch: MenuUpdate,
     menu_service: MenuService = Depends(get_menu_service),
 ) -> MenuInfo:
-    return menu_service.update(menu_id, patch)
+    return await menu_service.update(menu_id, patch)
 
 
 @router.delete(
@@ -69,8 +69,8 @@ def patch_menu(
     summary='Удаление меню',
     status_code=HTTPStatus.OK,
 )
-def delete_menu(
+async def delete_menu(
     menu_id: str,
     menu_service: MenuService = Depends(get_menu_service),
 ) -> Message:
-    return menu_service.delete(menu_id)
+    return await menu_service.delete(menu_id)
