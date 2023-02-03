@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
+# from asyncpg.exceptions import UniqueViolationError
 from fastapi import Depends, HTTPException
-from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,25 +23,25 @@ class MenuService():
     async def get_list(self) -> list[MenuInfo]:
         '''Получить список меню.'''
 
-        if is_cached('menu', 'all'):
-            return get_cache('menu', 'all')
+        if await is_cached('menu', 'all'):
+            return await get_cache('menu', 'all')
 
         menus = await crud.read_menus(self.db)
-        set_cache('menu', 'all', menus)
+        await set_cache('menu', 'all', menus)
         return menus
 
     async def get_info(self, menu_id: str) -> MenuInfo:
         '''Получить информацию о меню.'''
 
-        if is_cached('menu', menu_id):
-            return get_cache('menu', menu_id)
+        if await is_cached('menu', menu_id):
+            return await get_cache('menu', menu_id)
 
         menu = await crud.read_menu(menu_id, self.db)
         if not menu:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND, detail='menu not found',
             )
-        set_cache('menu', menu_id, menu)
+        await set_cache('menu', menu_id, menu)
         return menu
 
     async def create(self, data: MenuCreate) -> MenuInfo:
@@ -50,16 +50,17 @@ class MenuService():
         try:
             new_menu = await crud.create_menu(data, self.db)
         except IntegrityError as e:
-            if isinstance(e.orig, UniqueViolation):
-                raise HTTPException(
-                    status_code=HTTPStatus.BAD_REQUEST, detail='Menu with that title already exists',
-                )
-            else:
-                raise
+            # if e.orig.__class__ is UniqueViolationError:
+            print('СЮДАААА', 'ТИП', type(e.orig), 'НЕ ТИП', e.orig)
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST, detail='Menu with that title already exists',
+            )
+            # else:
+            #     raise
 
         created_menu = await crud.read_menu(new_menu.id, self.db)
-        set_cache('menu', new_menu.id, created_menu)
-        clear_cache('menu', 'all')  # чистим кэш получения списка меню
+        await set_cache('menu', new_menu.id, created_menu)
+        await clear_cache('menu', 'all')  # чистим кэш получения списка меню
         return created_menu
 
     async def update(self, menu_id: str, patch: MenuUpdate) -> MenuInfo:
@@ -72,8 +73,8 @@ class MenuService():
 
         await crud.update_menu(menu_id, patch, self.db)
         updated_menu = await crud.read_menu(menu_id, self.db)
-        set_cache('menu', menu_id, updated_menu)
-        clear_cache('menu', 'all')  # чистим кэш получения списка меню
+        await set_cache('menu', menu_id, updated_menu)
+        await clear_cache('menu', 'all')  # чистим кэш получения списка меню
         return updated_menu
 
     async def delete(self, menu_id: str) -> Message:
@@ -85,8 +86,8 @@ class MenuService():
             )
 
         await crud.delete_menu(menu_id, self.db)
-        clear_cache('menu', menu_id)
-        clear_cache('menu', 'all')  # чистим кэш получения списка меню
+        await clear_cache('menu', menu_id)
+        await clear_cache('menu', 'all')  # чистим кэш получения списка меню
         return Message(status=True, message='The menu has been deleted')
 
 

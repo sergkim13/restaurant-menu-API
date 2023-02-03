@@ -1,4 +1,6 @@
-from pydantic import BaseModel, validator
+from uuid import uuid4
+
+from pydantic import UUID4, BaseModel, Field, validator
 
 
 # Menu schemas
@@ -8,7 +10,7 @@ class MenuBase(BaseModel):
 
 
 class MenuInfo(MenuBase):
-    id: str
+    id: UUID4 = Field(default_factory=uuid4)
     submenus_count: int
     dishes_count: int
 
@@ -16,7 +18,7 @@ class MenuInfo(MenuBase):
         orm_mode = True
         schema_extra = {
             'example': {
-                'id': '777',
+                'id': '4a89f97a-c1e0-49a4-8f72-41934ed63439',
                 'title': 'My menu',
                 'description': 'My menu description',
                 'submenus_count': 7,
@@ -59,14 +61,14 @@ class SubmenuBase(BaseModel):
 
 
 class SubmenuInfo(SubmenuBase):
-    id: str
+    id: UUID4 = Field(default_factory=uuid4)
     dishes_count: int
 
     class Config:
         orm_mode = True
         schema_extra = {
             'example': {
-                'id': '888',
+                'id': '4a89f97a-c1e0-49a4-8f72-41934ed63439',
                 'title': 'My submenu',
                 'description': 'My submenu description',
                 'dishes_count': 8,
@@ -109,13 +111,13 @@ class DishBase(BaseModel):
 
 
 class DishInfo(DishBase):
-    id: str
+    id: UUID4 = Field(default_factory=uuid4)
 
     class Config:
         orm_mode = True
         schema_extra = {
             'example': {
-                'id': '999',
+                'id': '4a89f97a-c1e0-49a4-8f72-41934ed63439',
                 'title': 'My dish',
                 'description': 'My dish description',
                 'price': '90.00',

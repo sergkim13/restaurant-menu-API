@@ -28,25 +28,25 @@ class SubmenuService():
     async def get_list(self, menu_id: str) -> list[SubmenuInfo]:
         '''Получить список подменю.'''
 
-        if is_cached('submenu', 'all'):
-            return get_cache('submenu', 'all')
+        if await is_cached('submenu', 'all'):
+            return await get_cache('submenu', 'all')
 
         submenus = await crud.read_submenus(menu_id, self.db)
-        set_cache('submenu', 'all', submenus)
+        await set_cache('submenu', 'all', submenus)
         return submenus
 
     async def get_info(self, menu_id: str, submenu_id: str) -> SubmenuInfo:
         '''Получить информацию о подменю.'''
 
-        if is_cached('submenu', submenu_id):
-            return get_cache('submenu', submenu_id)
+        if await is_cached('submenu', submenu_id):
+            return await get_cache('submenu', submenu_id)
 
         submenu = await crud.read_submenu(menu_id, submenu_id, self.db)
         if not submenu:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND, detail='submenu not found',
             )
-        set_cache('submenu', submenu_id, submenu)
+        await set_cache('submenu', submenu_id, submenu)
         return submenu
 
     async def create(self, menu_id: str, data: SubmenuCreate) -> SubmenuInfo:
@@ -67,11 +67,11 @@ class SubmenuService():
                 raise
 
         created_submenu = await crud.read_submenu(menu_id, new_submenu.id, self.db)
-        set_cache('submenu', new_submenu.id, created_submenu)
+        await set_cache('submenu', new_submenu.id, created_submenu)
         # Чистим кэш для родительских элементов и получения списков элементов
-        clear_cache('submenu', 'all')
-        clear_cache('menu', menu_id)
-        clear_cache('menu', 'all')
+        await clear_cache('submenu', 'all')
+        await clear_cache('menu', menu_id)
+        await clear_cache('menu', 'all')
         return created_submenu
 
     async def update(self, menu_id: str, submenu_id: str, patch: SubmenuUpdate) -> SubmenuInfo:
@@ -83,9 +83,10 @@ class SubmenuService():
             )
 
         await crud.update_submenu(menu_id, submenu_id, patch, self.db)
-        updated_submenu = crud.read_submenu(menu_id, submenu_id, self.db)
-        set_cache('submenu', submenu_id, updated_submenu)
-        clear_cache('submenu', 'all')  # чистим кэш получения списка подменю
+        updated_submenu = await crud.read_submenu(menu_id, submenu_id, self.db)
+        await set_cache('submenu', submenu_id, updated_submenu)
+        # чистим кэш получения списка подменю
+        await clear_cache('submenu', 'all')
         return updated_submenu
 
     async def delete(self, menu_id: str, submenu_id: str) -> Message:
@@ -97,11 +98,11 @@ class SubmenuService():
             )
 
         await crud.delete_submenu(menu_id, submenu_id, self.db)
-        clear_cache('submenu', submenu_id)
+        await clear_cache('submenu', submenu_id)
         # Чистим кэш для родительских элементов и получения списков элементов
-        clear_cache('submenu', 'all')
-        clear_cache('menu', menu_id)
-        clear_cache('menu', 'all')
+        await clear_cache('submenu', 'all')
+        await clear_cache('menu', menu_id)
+        await clear_cache('menu', 'all')
         return Message(status=True, message='The submenu has been deleted')
 
 

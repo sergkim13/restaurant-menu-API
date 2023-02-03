@@ -23,25 +23,25 @@ class DishService():
     async def get_list(self, menu_id: str, submenu_id: str) -> list[DishInfo]:
         '''Получить список блюд.'''
 
-        if is_cached('dish', 'all'):
-            return get_cache('dish', 'all')
+        if await is_cached('dish', 'all'):
+            return await get_cache('dish', 'all')
 
         dishes = await crud.read_dishes(menu_id, submenu_id, self.db)
-        set_cache('dish', 'all', dishes)
+        await set_cache('dish', 'all', dishes)
         return dishes
 
     async def get_info(self, menu_id: str, submenu_id: str, dish_id: str) -> DishInfo:
         '''Полчить информациб о блюде.'''
 
-        if is_cached('dish', dish_id):
-            return get_cache('dish', dish_id)
+        if await is_cached('dish', dish_id):
+            return await get_cache('dish', dish_id)
 
         dish = await crud.read_dish(menu_id, submenu_id, dish_id, self.db)
         if not dish:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND, detail='dish not found',
             )
-        set_cache('dish', dish_id, dish)
+        await set_cache('dish', dish_id, dish)
         return dish
 
     async def create(self, menu_id: str, submenu_id: str, data: DishCreate) -> DishInfo:
@@ -64,13 +64,13 @@ class DishService():
         created_dish = await crud.read_dish(
             menu_id, submenu_id, new_dish.id, self.db,
         )
-        set_cache('dish', new_dish.id, created_dish)
+        await set_cache('dish', new_dish.id, created_dish)
         # Чистим кэш для родительских элементов и получения списков элементов
-        clear_cache('dish', 'all')
-        clear_cache('submenu', submenu_id)
-        clear_cache('submenu', 'all')
-        clear_cache('menu', menu_id)
-        clear_cache('menu', 'all')
+        await clear_cache('dish', 'all')
+        await clear_cache('submenu', submenu_id)
+        await clear_cache('submenu', 'all')
+        await clear_cache('menu', menu_id)
+        await clear_cache('menu', 'all')
         return created_dish
 
     async def update(self, menu_id: str, submenu_id: str, dish_id: str, patch: DishUpdate) -> DishInfo:
@@ -82,9 +82,9 @@ class DishService():
             )
 
         await crud.update_dish(menu_id, submenu_id, dish_id, patch, self.db)
-        updated_dish = crud.read_dish(menu_id, submenu_id, dish_id, self.db)
-        set_cache('dish', dish_id, updated_dish)
-        clear_cache('dish', 'all')  # чистим кэш получения списка блюд
+        updated_dish = await crud.read_dish(menu_id, submenu_id, dish_id, self.db)
+        await set_cache('dish', dish_id, updated_dish)
+        await clear_cache('dish', 'all')  # чистим кэш получения списка блюд
         return updated_dish
 
     async def delete(self, menu_id: str, submenu_id: str, dish_id: str) -> Message:
@@ -96,13 +96,13 @@ class DishService():
             )
 
         await crud.delete_dish(submenu_id, dish_id, self.db)
-        clear_cache('dish', dish_id)
+        await clear_cache('dish', dish_id)
         # Чистим кэш для родительских элементов и получения списков элементов
-        clear_cache('dish', 'all')
-        clear_cache('submenu', submenu_id)
-        clear_cache('submenu', 'all')
-        clear_cache('menu', menu_id)
-        clear_cache('menu', 'all')
+        await clear_cache('dish', 'all')
+        await clear_cache('submenu', submenu_id)
+        await clear_cache('submenu', 'all')
+        await clear_cache('menu', menu_id)
+        await clear_cache('menu', 'all')
         return Message(status=True, message='The dish has been deleted')
 
 

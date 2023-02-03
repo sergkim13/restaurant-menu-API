@@ -18,7 +18,9 @@ async def read_menus(db: AsyncSession):
     ).outerjoin(
         model.Dish,
         model.Dish.submenu_id == model.Submenu.id,
-    ).group_by(model.Menu.id)
+    ).group_by(
+        model.Menu.id,
+    )
     result = await db.execute(query)
     return result.all()
 
@@ -37,8 +39,10 @@ async def read_menu(menu_id: str, db: AsyncSession):
         model.Dish,
         model.Dish.submenu_id == model.Submenu.id,
     ).where(
-        model.Menu.id == int(menu_id),
-    ).group_by(model.Menu.id)
+        model.Menu.id == menu_id,
+    ).group_by(
+        model.Menu.id,
+    )
     result = await db.execute(query)
     return result.first()
 
@@ -60,13 +64,13 @@ async def update_menu(menu_id: str, patch: scheme.MenuUpdate, db: AsyncSession):
     stmt = update(
         model.Menu,
     ).where(
-        model.Menu.id == int(menu_id),
+        model.Menu.id == menu_id,
     ).values(**values)
     await db.execute(stmt)
     await db.commit()
 
 
 async def delete_menu(menu_id: str, db: AsyncSession):
-    stmt = delete(model.Menu).where(model.Menu.id == int(menu_id))
+    stmt = delete(model.Menu).where(model.Menu.id == menu_id)
     await db.execute(stmt)
     await db.commit()

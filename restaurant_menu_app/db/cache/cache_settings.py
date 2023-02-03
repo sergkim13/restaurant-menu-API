@@ -1,13 +1,18 @@
-import redis  # type: ignore
+import aioredis
 
-from config import REDIS_DB, REDIS_EXP, REDIS_HOST, REDIS_PORT
+from config import REDIS_DB, REDIS_EXP, REDIS_HOST  # , REDIS_PORT
 
-pool = redis.ConnectionPool(
-    host=f'{REDIS_HOST}',
-    port=f'{REDIS_PORT}',
-    db=f'{REDIS_DB}',
-    decode_responses=True,
-
+redis_client = aioredis.from_url(
+    f'redis://{REDIS_HOST}',
+    db=REDIS_DB,
 )
-redis_client = redis.Redis(connection_pool=pool)
+
+# pool = redis.ConnectionPool(
+#     host=f'{REDIS_HOST}',
+#     port=f'{REDIS_PORT}',
+#     db=f'{REDIS_DB}',
+#     decode_responses=True,
+
+# )
+# redis_client = redis.Redis(connection_pool=pool)
 EXPIRE_TIME = REDIS_EXP

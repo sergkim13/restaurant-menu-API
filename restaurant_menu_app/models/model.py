@@ -1,13 +1,7 @@
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    Float,
-    ForeignKey,
-    Identity,
-    MetaData,
-    String,
-    UniqueConstraint,
-)
+import uuid
+
+from sqlalchemy import Column, Float, ForeignKey, MetaData, String, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from restaurant_menu_app.db.main_db.database import Base
@@ -18,7 +12,8 @@ metadata = MetaData()
 class Menu(Base):
     __tablename__ = 'menus'
 
-    id = Column(BigInteger, Identity(always=True), primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # id = Column(BigInteger, Identity(always=True), primary_key=True)
     title = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
 
@@ -31,9 +26,10 @@ class Menu(Base):
 class Submenu(Base):
     __tablename__ = 'submenus'
 
-    id = Column(BigInteger, Identity(always=True), primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # id = Column(BigInteger, Identity(always=True), primary_key=True)
     menu_id = Column(
-        BigInteger, ForeignKey('menus.id', ondelete='CASCADE'),
+        ForeignKey('menus.id', ondelete='CASCADE'),
         nullable=False,
     )
     title = Column(String, nullable=False)
@@ -53,9 +49,9 @@ class Submenu(Base):
 class Dish(Base):
     __tablename__ = 'dishes'
 
-    id = Column(BigInteger, Identity(always=True), primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # id = Column(BigInteger, Identity(always=True), primary_key=True)
     submenu_id = Column(
-        BigInteger,
         ForeignKey('submenus.id', ondelete='CASCADE'),
         nullable=False,
     )

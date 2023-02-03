@@ -1,78 +1,82 @@
-from sqlalchemy import func  # , insert, select
-
-# from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
+from sqlalchemy import delete, func, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from restaurant_menu_app.models import model
 from restaurant_menu_app.schemas import scheme
 
 
-def read_submenus(menu_id: str, db: Session):
-    return db.query(
+async def read_submenus(menu_id: str, db: AsyncSession):
+    query = select(
         model.Submenu.id,
         model.Submenu.title,
         model.Submenu.description,
         func.count(model.Dish.id).label('dishes_count'),
-    ).join(
-        model.Menu,
-        model.Menu.id == model.Submenu.menu_id,
-    ).join(
+    ).outerjoin(
         model.Dish,
         model.Dish.submenu_id == model.Submenu.id,
-        isouter=True,
-    ).filter(
+    ).where(
         model.Menu.id == menu_id,
-    ).group_by(model.Submenu.id).all()
+    ).group_by(
+        model.Submenu.id,
+    )
+    result = await db.execute(query)
+    return result.all()
 
 
-def read_submenu(menu_id: str, submenu_id: str, db: Session):
-    return db.query(
+async def read_submenu(menu_id: str, submenu_id: str, db: AsyncSession):
+    query = select(
         model.Submenu.id,
         model.Submenu.title,
         model.Submenu.description,
         func.count(model.Dish.id).label('dishes_count'),
-    ).join(
-        model.Menu,
-        model.Menu.id == model.Submenu.menu_id,
-    ).join(
+    ).outerjoin(
         model.Dish,
         model.Dish.submenu_id == model.Submenu.id,
-        isouter=True,
-    ).filter(
+    ).where(
         model.Menu.id == menu_id,
         model.Submenu.id == submenu_id,
-    ).group_by(model.Submenu.id).first()
+    ).group_by(
+        model.Submenu.id,
+    )
+    result = await db.execute(query)
+    return result.first()
 
 
-def create_submenu(menu_id: str, data: scheme.SubmenuCreate, db: Session):
+async def create_submenu(menu_id: str, data: scheme.SubmenuCreate, db: AsyncSession):
     new_submenu = model.Submenu(menu_id=menu_id, **data.dict())
     db.add(new_submenu)
-    db.commit()
-    db.refresh(new_submenu)
+    await db.commit()
+    await db.refresh(new_submenu)
     return new_submenu
 
 
-def update_submenu(
+async def update_submenu(
         menu_id: str,
         submenu_id: str,
         patch: scheme.SubmenuUpdate,
-        db: Session,
+        db: AsyncSession,
 ):
-    submenu_to_update = read_submenu(menu_id, submenu_id, db)
+    submenu_to_update = await read_submenu(menu_id, submenu_id, db)
     values = patch.dict(exclude_unset=True)
     for key, value in values.items():
         if not value:
             values[key] = submenu_to_update[key]
-    db.query(model.Submenu).filter(
-        model.Submenu.id == submenu_id, model.Submenu.menu_id == menu_id,
-    ).update(values)
-    db.commit()
-
-
-def delete_submenu(menu_id: str, submenu_id: str, db: Session):
-    submenu = db.query(model.Submenu).filter(
+    stmt = update(
+        model.Submenu,
+    ).where(
         model.Submenu.id == submenu_id,
         model.Submenu.menu_id == menu_id,
-    ).first()
-    db.delete(submenu)
-    db.commit()
+    ).values(**values)
+    await db.execute(stmt)
+    await db.commit()
+
+
+async def delete_submenu(menu_id: str, submenu_id: str, db: AsyncSession):
+    stmt = delete(
+        model.Submenu,
+    ).where(
+        model.Submenu.id == submenu_id,
+        model.Submenu.menu_id == menu_id,
+    )
+    await db.execute(stmt)
+    await db.commit()
