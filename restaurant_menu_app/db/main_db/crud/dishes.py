@@ -11,11 +11,11 @@ async def read_dishes(menu_id: str, submenu_id: str, db: AsyncSession):
         model.Dish.title,
         model.Dish.description,
         model.Dish.price,
+    ).join(
+        model.Submenu,
     ).where(
-        model.Menu.id == model.Submenu.menu_id,
-        model.Submenu.id == model.Dish.submenu_id,
-        model.Menu.id == menu_id,
-        model.Dish.submenu_id == submenu_id,
+        model.Submenu.id == submenu_id,
+        model.Submenu.menu_id == menu_id,
     )
     result = await db.execute(query)
     return result.all()

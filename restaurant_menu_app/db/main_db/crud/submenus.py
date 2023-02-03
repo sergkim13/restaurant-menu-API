@@ -11,6 +11,9 @@ async def read_submenus(menu_id: str, db: AsyncSession):
         model.Submenu.title,
         model.Submenu.description,
         func.count(model.Dish.id).label('dishes_count'),
+    ).join(
+        model.Menu,
+        model.Menu.id == model.Submenu.menu_id,
     ).outerjoin(
         model.Dish,
         model.Dish.submenu_id == model.Submenu.id,
