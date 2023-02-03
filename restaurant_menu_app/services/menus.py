@@ -1,6 +1,5 @@
 from http import HTTPStatus
 
-# from asyncpg.exceptions import UniqueViolationError
 from fastapi import Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -50,13 +49,12 @@ class MenuService():
         try:
             new_menu = await crud.create_menu(data, self.db)
         except IntegrityError as e:
-            # if e.orig.__class__ is UniqueViolationError:
-            print('СЮДАААА', 'ТИП', type(e.orig), 'НЕ ТИП', e.orig)
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST, detail='Menu with that title already exists',
-            )
-            # else:
-            #     raise
+            if 'UniqueViolationError' in str(e.orig):
+                raise HTTPException(
+                    status_code=HTTPStatus.BAD_REQUEST, detail='Menu with that title already exists',
+                )
+            else:
+                raise
 
         created_menu = await crud.read_menu(new_menu.id, self.db)
         await set_cache('menu', new_menu.id, created_menu)

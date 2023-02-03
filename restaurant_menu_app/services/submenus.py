@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from fastapi import Depends, HTTPException
-from psycopg2.errors import ForeignKeyViolation, UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -55,11 +54,11 @@ class SubmenuService():
         try:
             new_submenu = await crud.create_submenu(menu_id, data, self.db)
         except IntegrityError as e:
-            if isinstance(e.orig, UniqueViolation):
+            if 'UniqueViolationError' in str(e.orig):
                 raise HTTPException(
                     status_code=HTTPStatus.BAD_REQUEST, detail='Submenu with that title already exists',
                 )
-            elif isinstance(e.orig, ForeignKeyViolation):
+            elif 'ForeignKeyViolationError' in str(e.orig):
                 raise HTTPException(
                     status_code=HTTPStatus.BAD_REQUEST, detail='parent menu not found',
                 )
