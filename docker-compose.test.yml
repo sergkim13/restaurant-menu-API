@@ -13,7 +13,7 @@ services:
     entrypoint: >
       sh -c "
         alembic upgrade head &&
-        SQLALCHEMY_SILENCE_UBER_WARNING=1 pytest -vv
+        SQLALCHEMY_SILENCE_UBER_WARNING=1 pytest -vv --disable-warnings
       "
     networks:
       - test_network

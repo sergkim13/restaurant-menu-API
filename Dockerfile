@@ -14,9 +14,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH "${PYTHONPATH}:/src"
 
-RUN apt-get update && \
-    apt-get -y install libpq-dev gcc
-
 WORKDIR  /src
 
 COPY --from=requirements-stage /tmp/requirements.txt /src/requirements.txt
