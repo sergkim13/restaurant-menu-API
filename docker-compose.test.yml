@@ -22,7 +22,7 @@ services:
         condition: service_healthy
       test_redis_db:
         condition: service_healthy
-  
+
   test_postgres_db:
     container_name: test_postgres_db
     image: postgres:15.1-alpine
@@ -60,7 +60,7 @@ services:
         interval: 10s
         timeout: 5s
         retries: 5
-  
+
 networks:
     test_network:
         name: test_network

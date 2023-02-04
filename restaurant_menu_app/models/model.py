@@ -10,7 +10,7 @@ metadata = MetaData()
 
 
 class Menu(Base):
-    __tablename__ = 'menus'
+    __tablename__ = "menus"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     # id = Column(BigInteger, Identity(always=True), primary_key=True)
@@ -18,49 +18,61 @@ class Menu(Base):
     description = Column(String, nullable=False)
 
     menu_submenus = relationship(
-        'Submenu', cascade='save-update, merge, delete',
-        passive_deletes=True, back_populates='main_menu',
+        "Submenu",
+        cascade="save-update, merge, delete",
+        passive_deletes=True,
+        back_populates="main_menu",
     )
 
 
 class Submenu(Base):
-    __tablename__ = 'submenus'
+    __tablename__ = "submenus"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     # id = Column(BigInteger, Identity(always=True), primary_key=True)
     menu_id = Column(
-        ForeignKey('menus.id', ondelete='CASCADE'),
+        ForeignKey("menus.id", ondelete="CASCADE"),
         nullable=False,
     )
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
-    main_menu = relationship('Menu', back_populates='menu_submenus')
+    main_menu = relationship("Menu", back_populates="menu_submenus")
     submenu_dishes = relationship(
-        'Dish', cascade='save-update, merge, delete',
-        passive_deletes=True, back_populates='submenu',
+        "Dish",
+        cascade="save-update, merge, delete",
+        passive_deletes=True,
+        back_populates="submenu",
     )
 
     __table_args__ = (
-        UniqueConstraint('menu_id', 'title', name='_menu_submenu_uc'),
+        UniqueConstraint(
+            "menu_id",
+            "title",
+            name="_menu_submenu_uc",
+        ),
     )
 
 
 class Dish(Base):
-    __tablename__ = 'dishes'
+    __tablename__ = "dishes"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     # id = Column(BigInteger, Identity(always=True), primary_key=True)
     submenu_id = Column(
-        ForeignKey('submenus.id', ondelete='CASCADE'),
+        ForeignKey("submenus.id", ondelete="CASCADE"),
         nullable=False,
     )
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
     price = Column(Float)
 
-    submenu = relationship('Submenu', back_populates='submenu_dishes')
+    submenu = relationship("Submenu", back_populates="submenu_dishes")
 
     __table_args__ = (
-        UniqueConstraint('submenu_id', 'title', name='_submenu_dish_uc'),
+        UniqueConstraint(
+            "submenu_id",
+            "title",
+            name="_submenu_dish_uc",
+        ),
     )

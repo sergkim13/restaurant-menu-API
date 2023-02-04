@@ -6,15 +6,15 @@ from restaurant_menu_app.schemas.scheme import DishCreate, DishInfo, DishUpdate,
 from restaurant_menu_app.services.dishes import DishService, get_dish_service
 
 router = APIRouter(
-    prefix='/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes',
-    tags=['Dishes'],
+    prefix="/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes",
+    tags=["Dishes"],
 )
 
 
 @router.get(
-    path='',
+    path="",
     response_model=list[DishInfo],
-    summary='Просмотр списка блюд',
+    summary="Просмотр списка блюд",
     status_code=HTTPStatus.OK,
 )
 async def get_dishes(
@@ -26,9 +26,9 @@ async def get_dishes(
 
 
 @router.get(
-    path='/{dish_id}',
+    path="/{dish_id}",
     response_model=DishInfo,
-    summary='Просмотр информации о блюде',
+    summary="Просмотр информации о блюде",
     status_code=HTTPStatus.OK,
 )
 async def get_dish(
@@ -41,9 +41,9 @@ async def get_dish(
 
 
 @router.post(
-    path='',
+    path="",
     response_model=DishInfo,
-    summary='Создание блюда',
+    summary="Создание блюда",
     status_code=HTTPStatus.CREATED,
 )
 async def post_dish(
@@ -56,9 +56,9 @@ async def post_dish(
 
 
 @router.patch(
-    path='/{dish_id}',
+    path="/{dish_id}",
     response_model=DishInfo,
-    summary='Обновление блюда',
+    summary="Обновление блюда",
     status_code=HTTPStatus.OK,
 )
 async def patch_dish(
@@ -72,9 +72,9 @@ async def patch_dish(
 
 
 @router.delete(
-    path='/{dish_id}',
+    path="/{dish_id}",
     response_model=Message,
-    summary='Удаление блюда',
+    summary="Удаление блюда",
     status_code=HTTPStatus.OK,
 )
 async def delete_dish(

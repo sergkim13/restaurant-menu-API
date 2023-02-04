@@ -23,7 +23,7 @@ async def clear_cache(key_prefix, key_body):
 
 
 def generate_key(key_prefix, key_body):
-    key = f'{key_prefix}:{key_body}'
+    key = f"{key_prefix}:{key_body}"
     return key
 
 

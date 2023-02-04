@@ -11,15 +11,15 @@ from restaurant_menu_app.schemas.scheme import (
 from restaurant_menu_app.services.submenus import SubmenuService, get_submenu_service
 
 router = APIRouter(
-    prefix='/api/v1/menus/{menu_id}/submenus',
-    tags=['Submenus'],
+    prefix="/api/v1/menus/{menu_id}/submenus",
+    tags=["Submenus"],
 )
 
 
 @router.get(
-    path='',
+    path="",
     response_model=list[SubmenuInfo],
-    summary='Просмотр списка подменю',
+    summary="Просмотр списка подменю",
     status_code=HTTPStatus.OK,
 )
 async def get_submenus(
@@ -30,9 +30,9 @@ async def get_submenus(
 
 
 @router.get(
-    path='/{submenu_id}',
+    path="/{submenu_id}",
     response_model=SubmenuInfo,
-    summary='Просмотр информации о подменю',
+    summary="Просмотр информации о подменю",
     status_code=HTTPStatus.OK,
 )
 async def get_submenu(
@@ -44,9 +44,9 @@ async def get_submenu(
 
 
 @router.post(
-    path='',
+    path="",
     response_model=SubmenuInfo,
-    summary='Создание подменю',
+    summary="Создание подменю",
     status_code=HTTPStatus.CREATED,
 )
 async def post_submenu(
@@ -54,14 +54,13 @@ async def post_submenu(
     new_submenu: SubmenuCreate,
     submenu_service: SubmenuService = Depends(get_submenu_service),
 ) -> SubmenuInfo:
-
     return await submenu_service.create(menu_id, new_submenu)
 
 
 @router.patch(
-    path='/{submenu_id}',
+    path="/{submenu_id}",
     response_model=SubmenuInfo,
-    summary='Обновление подменю',
+    summary="Обновление подменю",
     status_code=HTTPStatus.OK,
 )
 async def patch_submenu(
@@ -74,9 +73,9 @@ async def patch_submenu(
 
 
 @router.delete(
-    path='/{submenu_id}',
+    path="/{submenu_id}",
     response_model=Message,
-    summary='Удаление подменю',
+    summary="Удаление подменю",
     status_code=HTTPStatus.OK,
 )
 async def delete_submenu(

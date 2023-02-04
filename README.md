@@ -13,7 +13,7 @@ Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker, Redis.
 
 ### Install:
 1. Clone repository: `https://github.com/sergkim13/restaurant_menu_FastAPI.git`
-2. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `make stop` to stop app container. 
+2. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `make stop` to stop app container.
 3. Type `make compose-test` for running tests in docker container. Type `make stop-test` to stop app container.
 4. For checking `pre-commit hooks` you need `Poetry` and install dependencies:
     - `make install`
@@ -78,4 +78,3 @@ __________
 - Во время выдачи списка меню, для каждого меню добавлять кол-во подменю и блюд в этом меню.
 - Во время выдачи списка подменю, для каждого подменю добавлять кол-во блюд в этом подменю.
 - Во время запуска тестового сценария БД должна быть пуста.
-  

@@ -16,19 +16,17 @@ from tests.fixtures.menus_fixtures import new_menu
 from tests.fixtures.submenus_fixtures import new_submenu
 
 # Test database fixtures
-SQLALCHEMY_TEST_DATABASE_URL = (
-    f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{TEST_DB_NAME}'
-)
+SQLALCHEMY_TEST_DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{TEST_DB_NAME}"
 
 
-@pytest_asyncio.fixture(scope='session')
+@pytest_asyncio.fixture(scope="session")
 def event_loop():
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
 
 
-@pytest_asyncio.fixture(scope='session')
+@pytest_asyncio.fixture(scope="session")
 async def db_engine():
     engine = create_async_engine(SQLALCHEMY_TEST_DATABASE_URL)
 
@@ -41,7 +39,7 @@ async def db_engine():
     yield engine
 
 
-@pytest_asyncio.fixture(scope='function')
+@pytest_asyncio.fixture(scope="function")
 async def db(db_engine):
     connection = await db_engine.connect()
     transaction = await connection.begin()
@@ -53,11 +51,11 @@ async def db(db_engine):
     await connection.close()
 
 
-@pytest_asyncio.fixture(scope='function')
+@pytest_asyncio.fixture(scope="function")
 async def client(db):
     app.dependency_overrides[get_db] = lambda: db
 
-    async with AsyncClient(app=app, base_url='http://test') as client:
+    async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
 
@@ -72,7 +70,9 @@ async def fixture_menu(db):
 async def fixture_submenu(db, fixture_menu):
     menu = fixture_menu
     submenu = await crud.create_submenu(
-        menu.id, scheme.SubmenuCreate(**new_submenu), db,
+        menu.id,
+        scheme.SubmenuCreate(**new_submenu),
+        db,
     )
     return menu.id, await crud.read_submenu(menu.id, submenu.id, db)
 
@@ -86,6 +86,6 @@ async def fixture_dish(db, fixture_menu, fixture_submenu):
 
 
 # Auto clearing cache fixture
-@pytest_asyncio.fixture(scope='function', autouse=True)
+@pytest_asyncio.fixture(scope="function", autouse=True)
 async def clear_cache():
     await redis_client.flushdb()

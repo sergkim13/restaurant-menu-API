@@ -6,15 +6,15 @@ from restaurant_menu_app.schemas.scheme import MenuCreate, MenuInfo, MenuUpdate,
 from restaurant_menu_app.services.menus import MenuService, get_menu_service
 
 router = APIRouter(
-    prefix='/api/v1/menus',
-    tags=['Menus'],
+    prefix="/api/v1/menus",
+    tags=["Menus"],
 )
 
 
 @router.get(
-    path='',
+    path="",
     response_model=list[MenuInfo],
-    summary='Получение списка всех меню',
+    summary="Получение списка всех меню",
     status_code=HTTPStatus.OK,
 )
 async def get_menus(
@@ -24,9 +24,9 @@ async def get_menus(
 
 
 @router.get(
-    path='/{menu_id}',
+    path="/{menu_id}",
     response_model=MenuInfo,
-    summary='Получение информации о меню',
+    summary="Получение информации о меню",
     status_code=HTTPStatus.OK,
 )
 async def get_menu(
@@ -37,9 +37,9 @@ async def get_menu(
 
 
 @router.post(
-    path='',
+    path="",
     response_model=MenuInfo,
-    summary='Создание меню',
+    summary="Создание меню",
     status_code=HTTPStatus.CREATED,
 )
 async def post_menu(
@@ -50,9 +50,9 @@ async def post_menu(
 
 
 @router.patch(
-    path='/{menu_id}',
+    path="/{menu_id}",
     response_model=MenuInfo,
-    summary='Обновление меню',
+    summary="Обновление меню",
     status_code=HTTPStatus.OK,
 )
 async def patch_menu(
@@ -64,9 +64,9 @@ async def patch_menu(
 
 
 @router.delete(
-    path='/{menu_id}',
+    path="/{menu_id}",
     response_model=Message,
-    summary='Удаление меню',
+    summary="Удаление меню",
     status_code=HTTPStatus.OK,
 )
 async def delete_menu(

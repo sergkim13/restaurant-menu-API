@@ -17,12 +17,12 @@ class MenuInfo(MenuBase):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'id': '4a89f97a-c1e0-49a4-8f72-41934ed63439',
-                'title': 'My menu',
-                'description': 'My menu description',
-                'submenus_count': 7,
-                'dishes_count': 77,
+            "example": {
+                "id": "4a89f97a-c1e0-49a4-8f72-41934ed63439",
+                "title": "My menu",
+                "description": "My menu description",
+                "submenus_count": 7,
+                "dishes_count": 77,
             },
         }
 
@@ -33,9 +33,9 @@ class MenuCreate(MenuBase):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'title': 'My new menu',
-                'description': 'My new menu description',
+            "example": {
+                "title": "My new menu",
+                "description": "My new menu description",
             },
         }
 
@@ -47,9 +47,9 @@ class MenuUpdate(BaseModel):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'title': 'My updated menu',
-                'description': 'My updated menu description',
+            "example": {
+                "title": "My updated menu",
+                "description": "My updated menu description",
             },
         }
 
@@ -67,11 +67,11 @@ class SubmenuInfo(SubmenuBase):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'id': '4a89f97a-c1e0-49a4-8f72-41934ed63439',
-                'title': 'My submenu',
-                'description': 'My submenu description',
-                'dishes_count': 8,
+            "example": {
+                "id": "4a89f97a-c1e0-49a4-8f72-41934ed63439",
+                "title": "My submenu",
+                "description": "My submenu description",
+                "dishes_count": 8,
             },
         }
 
@@ -82,9 +82,9 @@ class SubmenuCreate(SubmenuBase):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'title': 'My new submenu',
-                'description': 'My new submenu description',
+            "example": {
+                "title": "My new submenu",
+                "description": "My new submenu description",
             },
         }
 
@@ -96,9 +96,9 @@ class SubmenuUpdate(BaseModel):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'title': 'My updated submenu',
-                'description': 'My updated submenu description',
+            "example": {
+                "title": "My updated submenu",
+                "description": "My updated submenu description",
             },
         }
 
@@ -116,17 +116,17 @@ class DishInfo(DishBase):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'id': '4a89f97a-c1e0-49a4-8f72-41934ed63439',
-                'title': 'My dish',
-                'description': 'My dish description',
-                'price': '90.00',
+            "example": {
+                "id": "4a89f97a-c1e0-49a4-8f72-41934ed63439",
+                "title": "My dish",
+                "description": "My dish description",
+                "price": "90.00",
             },
         }
 
-    @validator('price')
+    @validator("price")
     def normalize_price(cls, price):
-        return f'{price:0.2f}'
+        return f"{price:0.2f}"
 
 
 class DishCreate(DishBase):
@@ -135,10 +135,10 @@ class DishCreate(DishBase):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'title': 'My new dish',
-                'description': 'My new dish description',
-                'price': 90,
+            "example": {
+                "title": "My new dish",
+                "description": "My new dish description",
+                "price": 90,
             },
         }
 
@@ -151,10 +151,10 @@ class DishUpdate(BaseModel):
     class Config:
         orm_mode = True
         schema_extra = {
-            'example': {
-                'title': 'My updated dish',
-                'description': 'My updated dish description',
-                'price': 90,
+            "example": {
+                "title": "My updated dish",
+                "description": "My updated dish description",
+                "price": 90,
             },
         }
 
