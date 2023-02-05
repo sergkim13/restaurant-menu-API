@@ -47,6 +47,6 @@ async def get_all(db: AsyncSession):
         )
     )
     print(query)
-    result = await db.execute(query)
-    result_in_dict = jsonable_encoder(result.first())["json_agg"]
-    return result_in_dict
+    query_result = await db.execute(query)
+    result = jsonable_encoder(query_result.first())["json_agg"]
+    return result

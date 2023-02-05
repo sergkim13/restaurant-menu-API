@@ -32,14 +32,14 @@ async def generate_data(
     summary="Создание задачи на получение всех данных в excel-файле",
     status_code=HTTPStatus.ACCEPTED,
 )
-async def create_xlsx(task_service: TaskServise = Depends(get_task_service)):
-    return await task_service.create_task_for_get_all_content_in_xlsx()
+async def create_file_with_full_content(task_service: TaskServise = Depends(get_task_service)):
+    return await task_service.task_to_download_all_data()
 
 
 @router.get(
-    path="/content_as_file",
+    path="/content_as_file/{task_id}",
     summary="Получение резльутата задачи на получение всех данных в excel-файле",
     status_code=HTTPStatus.OK,
 )
-async def get_xlsx(task_service: TaskServise = Depends(get_task_service)):
-    pass
+async def get_file_with_full_content(task_id: str, task_service: TaskServise = Depends(get_task_service)):
+    return task_service.get_task_result(task_id)

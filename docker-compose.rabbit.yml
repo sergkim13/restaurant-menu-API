@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:latest
+    volumes:
+      - tasks-data:/var/lib/postgresql/data/
+    env_file:
+      - .docker.env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER_ID}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    expose:
+      - 5672
+      - 15672
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - prod_network
+
+networks:
+  prod_network:
+    name: prod_network
+
+volumes:
+  tasks-data:

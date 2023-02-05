@@ -1,13 +1,24 @@
+from datetime import datetime
+from pathlib import PurePath
+
 import openpyxl
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from restaurant_menu_app.db.main_db import crud
-from restaurant_menu_app.tasks.tasks_config import celery_app
+from restaurant_menu_app.tasks.tasks_app import celery_app
 
 
-@celery_app.task
-async def create_task():
-    return "Hello"
+@celery_app.task(track_started=True)
+def save_data_to_file(data: dict):
+    file_name = f"{datetime.now().strftime('%d-%m-%Y-%H-%M')}_restaurant_menu.xlsx"
+    file_path = str(PurePath(__file__).parent.joinpath("tasks_result", file_name))
+    save_to_xlsx(data, file_path)
+    return {"path": file_path, "file_name": file_name}
+
+
+def get_result(task_id: str):
+    task = celery_app.AsyncResult(task_id)
+    return task
 
 
 async def get_all_from_database(db: AsyncSession) -> dict:
@@ -15,7 +26,7 @@ async def get_all_from_database(db: AsyncSession) -> dict:
     return result
 
 
-async def save_to_xlsx(data: dict):
+def save_to_xlsx(data: dict, file_name: str):
     menus = data
     book = openpyxl.Workbook()
     sheet = book.active
@@ -45,5 +56,5 @@ async def save_to_xlsx(data: dict):
                 dish_row += 1
             submenu_row = dish_row
         menu_row = submenu_row
-    book.save("book.xlsx")
+    book.save(file_name)
     book.close()
