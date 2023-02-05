@@ -20,6 +20,9 @@ from .dishes import (
     delete_dish,
 )
 
+from .helpers import (
+    get_all,
+)
 
 __all__ = [
     "read_menus",
@@ -37,4 +40,5 @@ __all__ = [
     "create_dish",
     "update_dish",
     "delete_dish",
+    "get_all",
 ]

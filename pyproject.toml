@@ -20,6 +20,8 @@ asyncpg = "^0.27.0"
 aioredis = "^2.0.1"
 pytest-asyncio = "^0.20.3"
 aiofiles = "^22.1.0"
+celery = "^5.2.7"
+openpyxl = "^3.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
