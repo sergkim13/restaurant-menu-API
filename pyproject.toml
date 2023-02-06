@@ -30,6 +30,12 @@ mypy = "^0.991"
 flake8 = "^6.0.0"
 pre-commit = "^3.0.1"
 
+
+[tool.poetry.group.celery.dependencies]
+celery = "^5.2.7"
+openpyxl = "^3.1.0"
+python-dotenv = "^0.21.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

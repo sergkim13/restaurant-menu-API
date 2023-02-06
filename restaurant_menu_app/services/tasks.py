@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import Depends
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,10 +22,12 @@ class TaskServise:
     def get_task_result(self, task_id: str):
         task = tasks.get_result(task_id)
         if task.ready():
+            filename = task.result["file_name"]
+            filepath = str(Path("src").parent.absolute().joinpath("data", filename))
             return FileResponse(
-                path=task.result["path"],
-                filename=task.result["file_name"],
-                media_type="multipart/form-data",
+                path=filepath,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={"Content-Disposition": f"attachment; filename={filename}"},
             )
         else:
             return {"task_id": task_id, "status": task.status}

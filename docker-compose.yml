@@ -3,6 +3,8 @@ version: '3.8'
 services:
   restaurant_menu_app:
     container_name: restaurant_menu_app
+    volumes:
+      - tasks-data:/src/data
     env_file:
       - .docker.env
     build:
@@ -22,6 +24,8 @@ services:
       postgres_db:
         condition: service_healthy
       redis_db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   postgres_db:
@@ -62,9 +66,52 @@ services:
       timeout: 5s
       retries: 5
 
+  celery:
+    container_name: celery
+    volumes:
+      - tasks-data:/celery/data
+    env_file:
+      - .docker.env
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    entrypoint: >
+      sh -c "
+        celery -A restaurant_menu_app.tasks.tasks_app:celery_app worker --loglevel=INFO
+      "
+    networks:
+      - prod_network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:latest
+    env_file:
+      - .docker.env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    expose:
+      - 5672
+      - 15672
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - prod_network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 networks:
   prod_network:
     name: prod_network
+    driver: bridge
 
 volumes:
   db-data:
+  tasks-data:
