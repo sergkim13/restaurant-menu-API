@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from restaurant_menu_app.db.cache.cache_utils import (
     clear_cache,
@@ -13,12 +13,10 @@ from restaurant_menu_app.db.cache.cache_utils import (
 from restaurant_menu_app.db.main_db import crud
 from restaurant_menu_app.db.main_db.database import get_db
 from restaurant_menu_app.schemas.scheme import DishCreate, DishInfo, DishUpdate, Message
+from restaurant_menu_app.services.service_mixin import ServiceMixin
 
 
-class DishService:
-    def __init__(self, db: Session):
-        self.db = db
-
+class DishService(ServiceMixin):
     async def get_list(self, menu_id: str, submenu_id: str) -> list[DishInfo]:
         """Получить список блюд."""
 
@@ -113,5 +111,5 @@ class DishService:
         return Message(status=True, message="The dish has been deleted")
 
 
-def get_dish_service(db: Session = Depends(get_db)) -> DishService:
+def get_dish_service(db: AsyncSession = Depends(get_db)) -> DishService:
     return DishService(db=db)

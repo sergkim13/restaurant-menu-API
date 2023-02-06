@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import pytest
 
 from tests.fixtures.submenus_fixtures import (
@@ -14,7 +16,7 @@ async def test_get_empty_submenus(fixture_menu, client):
     menu_id = str(fixture_menu["id"])
 
     response = await client.get(f"/api/v1/menus/{menu_id}/submenus")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == []
 
 
@@ -28,7 +30,7 @@ async def test_post_submenu(fixture_menu, client):
         f"/api/v1/menus/{menu_id}/submenus",
         json=new_submenu,
     )
-    assert response.status_code == 201
+    assert response.status_code == HTTPStatus.CREATED
     assert "id" in response.json()
     assert response.json()["title"] == submenu_title
     assert response.json()["description"] == submenu_description
@@ -40,7 +42,7 @@ async def test_get_submenus(fixture_submenu, client):
     menu_id = fixture_submenu[0]
 
     response = await client.get(f"/api/v1/menus/{menu_id}/submenus")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert len(response.json()) == 1
 
 
@@ -52,7 +54,7 @@ async def test_get_submenu(fixture_submenu, client):
     submenu_description = fixture_submenu[1]["description"]
 
     response = await client.get(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json()["id"] == submenu_id
     assert response.json()["title"] == submenu_title
     assert response.json()["description"] == submenu_description
@@ -64,7 +66,7 @@ async def test_get_submenu_not_found(fixture_menu, client):
     menu_id = fixture_menu["id"]
 
     response = await client.get(f"/api/v1/menus/{menu_id}/submenus/{fake_id}")
-    assert response.status_code == 404
+    assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == submenu_not_found
 
 
@@ -79,7 +81,7 @@ async def test_patch_submenu(fixture_submenu, client):
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}",
         json=upd_submenu,
     )
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json()["id"] == submenu_id
     assert response.json()["title"] == submenu_title
     assert response.json()["description"] == submenu_description
@@ -92,9 +94,9 @@ async def test_delete_submenu(fixture_submenu, client):
     submenu_id = fixture_submenu[1]["id"]
 
     response = await client.delete(f"/api/v1/menus/{menu_id}/submenus/{submenu_id}")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == submenu_deleted
     response_after_delete = await client.get(
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}",
     )
-    assert response_after_delete.status_code == 404
+    assert response_after_delete.status_code == HTTPStatus.NOT_FOUND

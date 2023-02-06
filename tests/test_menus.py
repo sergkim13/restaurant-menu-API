@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import pytest
 
 from tests.fixtures.menus_fixtures import (
@@ -12,14 +14,14 @@ from tests.fixtures.menus_fixtures import (
 @pytest.mark.asyncio
 async def test_get_empty_menus(client):
     response = await client.get("/api/v1/menus")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == []
 
 
 @pytest.mark.asyncio
 async def test_post_menu(client):
     response = await client.post("/api/v1/menus", json=new_menu)
-    assert response.status_code == 201
+    assert response.status_code == HTTPStatus.CREATED
     assert "id" in response.json()
     assert response.json()["title"] == new_menu["title"]
     assert response.json()["description"] == new_menu["description"]
@@ -44,7 +46,7 @@ async def test_get_menu(fixture_menu, client):
     menu_description = fixture_menu["description"]
 
     response = await client.get(f"/api/v1/menus/{menu_id}")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json()["id"] == menu_id
     assert response.json()["title"] == menu_title
     assert response.json()["description"] == menu_description
@@ -53,7 +55,7 @@ async def test_get_menu(fixture_menu, client):
 @pytest.mark.asyncio
 async def test_get_menu_not_found(client):
     response = await client.get(f"/api/v1/menus/{fake_id}")
-    assert response.status_code == 404
+    assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == menu_not_found
 
 
@@ -64,7 +66,7 @@ async def test_patch_menu(fixture_menu, client):
     menu_description = upd_menu["description"]
 
     response = await client.patch(f"/api/v1/menus/{menu_id}", json=upd_menu)
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert "id" in response.json()
     assert response.json()["title"] == menu_title
     assert response.json()["description"] == menu_description
@@ -75,7 +77,7 @@ async def test_delete_menu(fixture_menu, client):
     menu_id = str(fixture_menu["id"])
 
     response = await client.delete(f"/api/v1/menus/{menu_id}")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == menu_deleted
     response_after_delete = await client.get(f"/api/v1/menus/{menu_id}")
-    assert response_after_delete.status_code == 404
+    assert response_after_delete.status_code == HTTPStatus.NOT_FOUND

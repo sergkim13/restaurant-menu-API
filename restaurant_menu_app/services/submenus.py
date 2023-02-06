@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from restaurant_menu_app.db.cache.cache_utils import (
     clear_cache,
@@ -18,12 +18,10 @@ from restaurant_menu_app.schemas.scheme import (
     SubmenuInfo,
     SubmenuUpdate,
 )
+from restaurant_menu_app.services.service_mixin import ServiceMixin
 
 
-class SubmenuService:
-    def __init__(self, db: Session):
-        self.db = db
-
+class SubmenuService(ServiceMixin):
     async def get_list(self, menu_id: str) -> list[SubmenuInfo]:
         """Получить список подменю."""
 
@@ -110,5 +108,5 @@ class SubmenuService:
         return Message(status=True, message="The submenu has been deleted")
 
 
-def get_submenu_service(db: Session = Depends(get_db)) -> SubmenuService:
+def get_submenu_service(db: AsyncSession = Depends(get_db)) -> SubmenuService:
     return SubmenuService(db=db)

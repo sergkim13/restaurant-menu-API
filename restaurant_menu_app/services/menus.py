@@ -13,12 +13,10 @@ from restaurant_menu_app.db.cache.cache_utils import (
 from restaurant_menu_app.db.main_db import crud
 from restaurant_menu_app.db.main_db.database import get_db
 from restaurant_menu_app.schemas.scheme import MenuCreate, MenuInfo, MenuUpdate, Message
+from restaurant_menu_app.services.service_mixin import ServiceMixin
 
 
-class MenuService:
-    def __init__(self, db: AsyncSession):
-        self.db = db
-
+class MenuService(ServiceMixin):
     async def get_list(self) -> list[MenuInfo]:
         """Получить список меню."""
 

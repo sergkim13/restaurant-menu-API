@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import pytest
 
 from tests.fixtures.dishes_fixtures import (
@@ -17,7 +19,7 @@ async def test_get_empty_dishes(fixture_submenu, client):
     response = await client.get(
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes",
     )
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == []
 
 
@@ -33,7 +35,7 @@ async def test_post_dish(fixture_submenu, client):
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes",
         json=new_dish,
     )
-    assert response.status_code == 201
+    assert response.status_code == HTTPStatus.CREATED
     assert "id" in response.json()
     assert response.json()["title"] == dish_title
     assert response.json()["description"] == dish_description
@@ -48,7 +50,7 @@ async def test_get_dishes(fixture_dish, client):
     response = await client.get(
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes",
     )
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert len(response.json()) == 1
 
 
@@ -64,7 +66,7 @@ async def test_get_dish(fixture_dish, client):
     response = await client.get(
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     )
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json()["id"] == dish_id
     assert response.json()["title"] == dish_title
     assert response.json()["description"] == dish_description
@@ -79,7 +81,7 @@ async def test_get_dish_not_found(fixture_submenu, client):
     response = await client.get(
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{fake_id}",
     )
-    assert response.status_code == 404
+    assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == dish_not_found
 
 
@@ -96,7 +98,7 @@ async def test_patch_dish(fixture_dish, client):
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
         json=upd_dish,
     )
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json()["id"] == dish_id
     assert response.json()["title"] == dish_title
     assert response.json()["description"] == dish_description
@@ -112,9 +114,9 @@ async def test_delete_dish(fixture_dish, client):
     response = await client.delete(
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     )
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == dish_deleted
     response_after_delete = await client.get(
         f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     )
-    assert response_after_delete.status_code == 404
+    assert response_after_delete.status_code == HTTPStatus.NOT_FOUND

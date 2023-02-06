@@ -3,11 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends
 
 from restaurant_menu_app.schemas.scheme import Message
-from restaurant_menu_app.services.data_generator import (
-    DataGeneratorService,
-    get_data_generator_service,
-)
-from restaurant_menu_app.services.tasks import TaskServise, get_task_service
+from restaurant_menu_app.services.helper import HelperServise, get_helper_service
 
 router = APIRouter(
     prefix="/api/v1",
@@ -16,15 +12,15 @@ router = APIRouter(
 
 
 @router.post(
-    path="/generated_data",
+    path="/generated_test_data",
     response_model=Message,
     summary="Генерация тестовых данных",
     status_code=HTTPStatus.CREATED,
 )
 async def generate_data(
-    data_generator: DataGeneratorService = Depends(get_data_generator_service),
+    helper_service: HelperServise = Depends(get_helper_service),
 ) -> Message:
-    return await data_generator.generate()
+    return await helper_service.generate_test_data()
 
 
 @router.post(
@@ -32,8 +28,8 @@ async def generate_data(
     summary="Создание задачи на получение всех данных в excel-файле",
     status_code=HTTPStatus.ACCEPTED,
 )
-async def create_file_with_full_content(task_service: TaskServise = Depends(get_task_service)):
-    return await task_service.task_to_download_all_data()
+async def create_file_with_full_content(helper_service: HelperServise = Depends(get_helper_service)):
+    return await helper_service.put_all_data_to_file()
 
 
 @router.get(
@@ -41,5 +37,5 @@ async def create_file_with_full_content(task_service: TaskServise = Depends(get_
     summary="Получение резльутата задачи на получение всех данных в excel-файле",
     status_code=HTTPStatus.OK,
 )
-async def get_file_with_full_content(task_id: str, task_service: TaskServise = Depends(get_task_service)):
-    return task_service.get_task_result(task_id)
+async def get_file_with_full_content(task_id: str, helper_service: HelperServise = Depends(get_helper_service)):
+    return helper_service.get_all_data_in_file(task_id)
