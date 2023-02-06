@@ -4,7 +4,16 @@
 
 ### Description:
 Restaurant menu API allows you to get information about menus, submenus and dishes. See "Task description" section below for more.
-Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker, Redis.
+Made with:
+- FastAPI,
+- PostgreSQL,
+- SQLAlchemy,
+- Pydantic,
+- Alembic,
+- Docker,
+- Redis,
+- Celery,
+- RabbitMQ.
 
 ### Requirements:
 1. MacOS (prefer) / Linux / Windows10
@@ -18,11 +27,36 @@ Made with FastAPI, PostgreSQL, SQLAlchemy, pydantic, alembic, Docker, Redis.
 4. For checking `pre-commit hooks` you need `Poetry` and install dependencies:
     - `make install`
     - `make hooks`
+5. To generate test data:
+`POST http://0.0.0.0:8000/api/v1/generated_test_data`
+6. To create xlsx-file with all data:
+`POST http://0.0.0.0:8000/api/v1/content_as_file`
+You will get `task_id` as a response.
+7. To download xlsx-file with all data:
+`GET http://0.0.0.0:8000/api/v1/content_as_file/{task_id}`
 
 Pre-commit hooks demo:
-[![asciicast](https://asciinema.org/a/EiyQ6mOfD3QHo6r5atuzNcl1P.svg)](https://asciinema.org/a/EiyQ6mOfD3QHo6r5atuzNcl1P)
+[![asciicast](https://asciinema.org/a/UoPQrqTPphCQbaCHselI5VPYU.svg)](https://asciinema.org/a/UoPQrqTPphCQbaCHselI5VPYU)
+
+### **Task description (stage №4)**
+В этом домашнем задании надо:
+1. Переписать текущее FastAPI приложение на асинхронное выполнение.
+2. Добавить в проект фоновую задачу с помощью Celery + RabbitMQ.
+Фоновая задача по генераций меню нашего ресторана в виде excel-документа.
+Для этого пункта понадобится добавить 2 ендпоинта:
+- (POST) для запуска фоновой задачи для генераций excel-файла
+- (GET) для получения результата задачи в виде ссылки на скачивание excel-файла
+3. Отдельный ендпоинт который заполнит базу тестовыми данными, для последующего генераций меню в excel-файл
+
+Требования:
+- Данные меню, подменю, блюд для генераций excel-файла, должны доставаться одним ORM-запросом в БД (использовать подзапросы и агрегирующие функций SQL).
+- Код должен проходить все линтеры (black, autopep, flake8, mypy, isort). Файл с pre-commit хуками будет приложен к презентаций.
+- Проект должен соответствовать требованиям в предыдущих вебинарах.
+
+
+
 __________
-### **Task description (stage №3)**.
+### **Task description (stage №3)** - ✅.
 В этом домашнем задании надо:
 1. Вынести бизнес логику и запросы в БД в отдельные слои приложения.
 2. Добавить кэш хранилище Redis
