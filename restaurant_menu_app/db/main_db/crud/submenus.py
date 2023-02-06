@@ -45,7 +45,7 @@ async def read_submenu(menu_id: str, submenu_id: str, db: AsyncSession):
             model.Dish.submenu_id == model.Submenu.id,
         )
         .where(
-            model.Menu.id == menu_id,
+            model.Submenu.menu_id == menu_id,
             model.Submenu.id == submenu_id,
         )
         .group_by(

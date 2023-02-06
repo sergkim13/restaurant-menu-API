@@ -26,6 +26,7 @@ flower = "^1.2.0"
 mypy = "^0.991"
 flake8 = "^6.0.0"
 pre-commit = "^3.0.1"
+pytest-cov = "^4.0.0"
 
 
 [tool.poetry.group.celery.dependencies]

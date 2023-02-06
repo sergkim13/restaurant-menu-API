@@ -31,3 +31,6 @@ hooks:
 
 test:
 	poetry run pytest -vv
+
+test-coverage:
+	poetry run pytest --cov-report term-missing --cov=restaurant_menu_app --cov-report xml
