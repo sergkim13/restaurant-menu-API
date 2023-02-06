@@ -246,7 +246,7 @@ python-versions = "*"
 name = "et-xmlfile"
 version = "1.1.0"
 description = "An implementation of lxml.xmlfile for the standard library"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -548,7 +548,7 @@ setuptools = "*"
 name = "openpyxl"
 version = "3.1.0"
 description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -694,7 +694,7 @@ testing = ["coverage (>=6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy 
 name = "python-dotenv"
 version = "0.21.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -919,7 +919,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8.1"
-content-hash = "2be5f2022ed00459cbc26336ce75fd96ee9194e21eba4b87f26e604c71524e86"
+content-hash = "874eb5462cc472c74091bbacb2e9c873453c2c95113c518c71f51852eb9ccb2b"
 
 [metadata.files]
 aiofiles = [
