@@ -32,22 +32,24 @@ def save_to_xlsx(data: dict, file_name: str):
         submenu_row = menu_row + 1
         submenu_column = menu_column + 1
         submenu_counter = 1
-        for submenu in menu["child_submenus"]:
-            sheet.cell(submenu_row, submenu_column).value = submenu_counter
-            sheet.cell(submenu_row, submenu_column + 1).value = submenu["submenu_title"]
-            sheet.cell(submenu_row, submenu_column + 2).value = submenu["submenu_description"]
-            submenu_counter += 1
-            dish_row = submenu_row + 1
-            dish_column = submenu_column + 1
-            dish_counter = 1
-            for dish in submenu["child_dishes"]:
-                sheet.cell(dish_row, dish_column).value = dish_counter
-                sheet.cell(dish_row, dish_column + 1).value = dish["dish_title"]
-                sheet.cell(dish_row, dish_column + 2).value = dish["dish_description"]
-                sheet.cell(dish_row, dish_column + 3).value = dish["dish_price"]
-                dish_counter += 1
-                dish_row += 1
-            submenu_row = dish_row
+        if menu["child_submenus"]:
+            for submenu in menu["child_submenus"]:
+                sheet.cell(submenu_row, submenu_column).value = submenu_counter
+                sheet.cell(submenu_row, submenu_column + 1).value = submenu["submenu_title"]
+                sheet.cell(submenu_row, submenu_column + 2).value = submenu["submenu_description"]
+                submenu_counter += 1
+                dish_row = submenu_row + 1
+                dish_column = submenu_column + 1
+                dish_counter = 1
+                if submenu["child_dishes"]:
+                    for dish in submenu["child_dishes"]:
+                        sheet.cell(dish_row, dish_column).value = dish_counter
+                        sheet.cell(dish_row, dish_column + 1).value = dish["dish_title"]
+                        sheet.cell(dish_row, dish_column + 2).value = dish["dish_description"]
+                        sheet.cell(dish_row, dish_column + 3).value = dish["dish_price"]
+                        dish_counter += 1
+                        dish_row += 1
+                submenu_row = dish_row
         menu_row = submenu_row
     book.save(file_name)
     book.close()

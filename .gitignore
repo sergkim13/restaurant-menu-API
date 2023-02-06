@@ -9,3 +9,4 @@ tempCodeRunnerFile.py
 .mypy_cache/
 *.rdb
 .env
+data/

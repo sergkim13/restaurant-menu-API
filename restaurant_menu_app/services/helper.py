@@ -1,8 +1,9 @@
 import json
+from http import HTTPStatus
 from pathlib import Path
 
 import aiofiles  # type: ignore
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,6 +22,12 @@ from restaurant_menu_app.tasks import tasks
 class HelperServise(ServiceMixin):
     async def put_all_data_to_file(self) -> Message:
         data = await crud.get_all(self.db)
+        if data is None:
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST,
+                detail="Database is empty!",
+            )
+
         task = tasks.save_data_to_file.delay(data)
         return Message(status=True, message=f"Task registred with ID: {task.id}")
 
