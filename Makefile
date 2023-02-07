@@ -1,11 +1,7 @@
 install:
 	poetry install
 
-prepare-migrations:
-	poetry run alembic init migrations
-
 migration:
-	poetry run alembic revision --autogenerate -m 'Creating tables'
 	poetry run alembic upgrade head
 
 start:

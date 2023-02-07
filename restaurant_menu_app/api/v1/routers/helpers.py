@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import FileResponse
 
 from restaurant_menu_app.schemas.scheme import Message
 from restaurant_menu_app.services.helper import HelperServise, get_helper_service
@@ -36,6 +37,7 @@ async def create_file_with_full_content(helper_service: HelperServise = Depends(
     path="/content_as_file/{task_id}",
     summary="Получение резльутата задачи на получение всех данных в excel-файле",
     status_code=HTTPStatus.OK,
+    response_class=FileResponse,
 )
 async def get_file_with_full_content(task_id: str, helper_service: HelperServise = Depends(get_helper_service)):
     return helper_service.get_all_data_in_file(task_id)

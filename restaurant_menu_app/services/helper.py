@@ -45,35 +45,35 @@ class HelperServise(ServiceMixin):
             return {"task_id": task_id, "status": task.status}
 
     async def generate_test_data(self) -> Message:
-        data = await HelperServise.__get_data_from_source(self)
+        data = await self.get_data_from_source()
         try:
-            await HelperServise.__create_items(self, data)
+            await self.create_items(data)
         except Exception:
             await self.db.rollback()
             raise
 
         return Message(status=True, message="test data created")
 
-    async def __get_data_from_source(self):
+    async def get_data_from_source(self):
         source_path = "restaurant_menu_app/services/data/prepared_data.json"
         async with aiofiles.open(source_path, "r") as source:
             data = await source.read()
             data1 = json.loads(data)
         return data1
 
-    async def __create_items(self, data, parent_id=None):
+    async def create_items(self, data, parent_id=None):
         for item in data:
             if "submenus" in item.keys():
                 menu_to_create = MenuCreate(title=item["title"], description=item["description"])
                 created_menu = await crud.create_menu(data=menu_to_create, db=self.db)
                 child_submenus = [submenu for submenu in item["submenus"]]
-                await HelperServise.__create_items(self, child_submenus, parent_id=created_menu.id)
+                await self.create_items(child_submenus, parent_id=created_menu.id)
 
             elif "dishes" in item.keys():
                 submenu_to_create = SubmenuCreate(title=item["title"], description=item["description"])
                 created_submenu = await crud.create_submenu(menu_id=parent_id, data=submenu_to_create, db=self.db)
                 child_dishes = [dish for dish in item["dishes"]]
-                await HelperServise.__create_items(self, child_dishes, parent_id=created_submenu.id)
+                await self.create_items(child_dishes, parent_id=created_submenu.id)
 
             else:
                 dish_to_create = DishCreate(title=item["title"], description=item["description"], price=item["price"])
