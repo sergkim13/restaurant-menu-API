@@ -1,6 +1,6 @@
 import aioredis
 
-from config import REDIS_DB, REDIS_EXP, REDIS_HOST  # , REDIS_PORT
+from config import REDIS_DB, REDIS_EXP, REDIS_HOST
 
 redis_client = aioredis.from_url(
     f"redis://{REDIS_HOST}",
