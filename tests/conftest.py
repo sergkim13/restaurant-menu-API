@@ -7,7 +7,9 @@ from sqlalchemy_utils import create_database, database_exists
 
 from config import DB_HOST, DB_PASS, DB_PORT, DB_USER, TEST_DB_NAME
 from restaurant_menu_app.db.cache.cache_settings import redis_client
-from restaurant_menu_app.db.main_db import crud
+from restaurant_menu_app.db.main_db.crud.dishes import DishCRUD
+from restaurant_menu_app.db.main_db.crud.menus import MenuCRUD
+from restaurant_menu_app.db.main_db.crud.submenus import SubmenuCRUD
 from restaurant_menu_app.db.main_db.database import Base, get_db
 from restaurant_menu_app.main import app
 from restaurant_menu_app.schemas import scheme
@@ -19,6 +21,7 @@ from tests.fixtures.submenus_fixtures import new_submenu
 SQLALCHEMY_TEST_DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{TEST_DB_NAME}"
 
 
+# Test database fixtures
 @pytest_asyncio.fixture(scope="session")
 def event_loop():
     loop = asyncio.get_event_loop_policy().new_event_loop()
@@ -60,29 +63,33 @@ async def client(db):
 
 
 # CRUD fixtures
+
+
 @pytest_asyncio.fixture
 async def fixture_menu(db):
-    menu = await crud.create_menu(scheme.MenuCreate(**new_menu), db)
-    return await crud.read_menu(menu.id, db)
+    menu_crud = MenuCRUD(db)
+    menu = await menu_crud.create(scheme.MenuCreate(**new_menu))
+    return await menu_crud.read(menu.id)
 
 
 @pytest_asyncio.fixture
 async def fixture_submenu(db, fixture_menu):
+    submenu_crud = SubmenuCRUD(db)
     menu = fixture_menu
-    submenu = await crud.create_submenu(
+    submenu = await submenu_crud.create(
         menu.id,
         scheme.SubmenuCreate(**new_submenu),
-        db,
     )
-    return menu.id, await crud.read_submenu(menu.id, submenu.id, db)
+    return menu.id, await submenu_crud.read(menu.id, submenu.id)
 
 
 @pytest_asyncio.fixture
 async def fixture_dish(db, fixture_menu, fixture_submenu):
+    dish_crud = DishCRUD(db)
     menu = fixture_menu
     submenu = fixture_submenu[1]
-    dish = await crud.create_dish(submenu.id, scheme.DishCreate(**new_dish), db)
-    return menu.id, submenu.id, await crud.read_dish(menu.id, submenu.id, dish.id, db)
+    dish = await dish_crud.create(submenu.id, scheme.DishCreate(**new_dish))
+    return menu.id, submenu.id, await dish_crud.read(menu.id, submenu.id, dish.id)
 
 
 # Auto clearing cache fixture
