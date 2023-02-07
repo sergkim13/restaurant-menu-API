@@ -12,7 +12,7 @@ metadata = MetaData()
 class Menu(Base):
     __tablename__ = "menus"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     title = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=False)
 
@@ -27,7 +27,7 @@ class Menu(Base):
 class Submenu(Base):
     __tablename__ = "submenus"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     menu_id = Column(
         ForeignKey("menus.id", ondelete="CASCADE"),
         nullable=False,
@@ -55,7 +55,7 @@ class Submenu(Base):
 class Dish(Base):
     __tablename__ = "dishes"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     submenu_id = Column(
         ForeignKey("submenus.id", ondelete="CASCADE"),
         nullable=False,
