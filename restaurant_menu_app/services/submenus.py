@@ -10,7 +10,7 @@ from restaurant_menu_app.db.cache.cache_utils import (
     is_cached,
     set_cache,
 )
-from restaurant_menu_app.db.main_db import crud
+from restaurant_menu_app.db.main_db.crud.submenus import SubmenuCRUD
 from restaurant_menu_app.db.main_db.database import get_db
 from restaurant_menu_app.schemas.scheme import (
     Message,
@@ -18,17 +18,19 @@ from restaurant_menu_app.schemas.scheme import (
     SubmenuInfo,
     SubmenuUpdate,
 )
-from restaurant_menu_app.services.service_mixin import ServiceMixin
 
 
-class SubmenuService(ServiceMixin):
+class SubmenuService:
+    def __init__(self, submenu_crud: SubmenuCRUD) -> None:
+        self.submenu_crud = submenu_crud
+
     async def get_list(self, menu_id: str) -> list[SubmenuInfo]:
         """Получить список подменю."""
 
         if await is_cached("submenu", "all"):
             return await get_cache("submenu", "all")
 
-        submenus = await crud.read_submenus(menu_id, self.db)
+        submenus = await self.submenu_crud.read_all(menu_id)
         await set_cache("submenu", "all", submenus)
         return submenus
 
@@ -38,7 +40,7 @@ class SubmenuService(ServiceMixin):
         if await is_cached("submenu", submenu_id):
             return await get_cache("submenu", submenu_id)
 
-        submenu = await crud.read_submenu(menu_id, submenu_id, self.db)
+        submenu = await self.submenu_crud.read(menu_id, submenu_id)
         if not submenu:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
@@ -51,7 +53,7 @@ class SubmenuService(ServiceMixin):
         """Создать подменю."""
 
         try:
-            new_submenu = await crud.create_submenu(menu_id, data, self.db)
+            new_submenu = await self.submenu_crud.create(menu_id, data)
         except IntegrityError as e:
             if "UniqueViolationError" in str(e.orig):
                 raise HTTPException(
@@ -66,7 +68,7 @@ class SubmenuService(ServiceMixin):
             else:
                 raise
 
-        created_submenu = await crud.read_submenu(menu_id, new_submenu.id, self.db)
+        created_submenu = await self.submenu_crud.read(menu_id, new_submenu.id)
         await set_cache("submenu", new_submenu.id, created_submenu)
         # Чистим кэш для родительских элементов и получения списков элементов
         await clear_cache("submenu", "all")
@@ -77,14 +79,14 @@ class SubmenuService(ServiceMixin):
     async def update(self, menu_id: str, submenu_id: str, patch: SubmenuUpdate) -> SubmenuInfo:
         """Обновить подменю."""
 
-        if not await crud.read_submenu(menu_id, submenu_id, self.db):
+        if not await self.submenu_crud.read(menu_id, submenu_id):
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail="submenu not found",
             )
 
-        await crud.update_submenu(menu_id, submenu_id, patch, self.db)
-        updated_submenu = await crud.read_submenu(menu_id, submenu_id, self.db)
+        await self.submenu_crud.update(menu_id, submenu_id, patch)
+        updated_submenu = await self.submenu_crud.read(menu_id, submenu_id)
         await set_cache("submenu", submenu_id, updated_submenu)
         # чистим кэш получения списка подменю
         await clear_cache("submenu", "all")
@@ -93,13 +95,13 @@ class SubmenuService(ServiceMixin):
     async def delete(self, menu_id: str, submenu_id: str) -> Message:
         """Удалить подменю."""
 
-        if not await crud.read_submenu(menu_id, submenu_id, self.db):
+        if not await self.submenu_crud.read(menu_id, submenu_id):
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail="submenu not found",
             )
 
-        await crud.delete_submenu(menu_id, submenu_id, self.db)
+        await self.submenu_crud.delete(menu_id, submenu_id)
         await clear_cache("submenu", submenu_id)
         # Чистим кэш для родительских элементов и получения списков элементов
         await clear_cache("submenu", "all")
@@ -109,4 +111,5 @@ class SubmenuService(ServiceMixin):
 
 
 def get_submenu_service(db: AsyncSession = Depends(get_db)) -> SubmenuService:
-    return SubmenuService(db=db)
+    submenu_crud = SubmenuCRUD(db=db)
+    return SubmenuService(submenu_crud=submenu_crud)

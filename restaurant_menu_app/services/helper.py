@@ -7,7 +7,11 @@ from fastapi import Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from restaurant_menu_app.db.main_db import crud
+from restaurant_menu_app.db.main_db.crud.abstract_crud import AbstractCRUD
+from restaurant_menu_app.db.main_db.crud.dishes import DishCRUD
+from restaurant_menu_app.db.main_db.crud.helpers import HelperCRUD
+from restaurant_menu_app.db.main_db.crud.menus import MenuCRUD
+from restaurant_menu_app.db.main_db.crud.submenus import SubmenuCRUD
 from restaurant_menu_app.db.main_db.database import get_db
 from restaurant_menu_app.schemas.scheme import (
     DishCreate,
@@ -15,13 +19,26 @@ from restaurant_menu_app.schemas.scheme import (
     Message,
     SubmenuCreate,
 )
-from restaurant_menu_app.services.service_mixin import ServiceMixin
 from restaurant_menu_app.tasks import tasks
 
 
-class HelperServise(ServiceMixin):
+class HelperServise:
+    def __init__(
+        self,
+        db: AsyncSession,
+        helper_crud: HelperCRUD,
+        menu_crud: AbstractCRUD,
+        submenu_crud: AbstractCRUD,
+        dish_crud: AbstractCRUD,
+    ) -> None:
+        self.db = db
+        self.helper_crud = helper_crud
+        self.menu_crud = menu_crud
+        self.submenu_crud = submenu_crud
+        self.dish_crud = dish_crud
+
     async def put_all_data_to_file(self) -> Message:
-        data = await crud.get_all(self.db)
+        data = await self.helper_crud.get_all()
         if data is None:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
@@ -65,20 +82,30 @@ class HelperServise(ServiceMixin):
         for item in data:
             if "submenus" in item.keys():
                 menu_to_create = MenuCreate(title=item["title"], description=item["description"])
-                created_menu = await crud.create_menu(data=menu_to_create, db=self.db)
+                created_menu = await self.menu_crud.create(data=menu_to_create)
                 child_submenus = [submenu for submenu in item["submenus"]]
                 await self.create_items(child_submenus, parent_id=created_menu.id)
 
             elif "dishes" in item.keys():
                 submenu_to_create = SubmenuCreate(title=item["title"], description=item["description"])
-                created_submenu = await crud.create_submenu(menu_id=parent_id, data=submenu_to_create, db=self.db)
+                created_submenu = await self.submenu_crud.create(menu_id=parent_id, data=submenu_to_create)
                 child_dishes = [dish for dish in item["dishes"]]
                 await self.create_items(child_dishes, parent_id=created_submenu.id)
 
             else:
                 dish_to_create = DishCreate(title=item["title"], description=item["description"], price=item["price"])
-                await crud.create_dish(submenu_id=parent_id, data=dish_to_create, db=self.db)
+                await self.dish_crud.create(submenu_id=parent_id, data=dish_to_create)
 
 
 def get_helper_service(db: AsyncSession = Depends(get_db)) -> HelperServise:
-    return HelperServise(db=db)
+    helper_crud = HelperCRUD(db=db)
+    menu_crud = MenuCRUD(db=db)
+    submenu_crud = SubmenuCRUD(db=db)
+    dish_crud = DishCRUD(db=db)
+    return HelperServise(
+        db=db,
+        helper_crud=helper_crud,
+        menu_crud=menu_crud,
+        submenu_crud=submenu_crud,
+        dish_crud=dish_crud,
+    )

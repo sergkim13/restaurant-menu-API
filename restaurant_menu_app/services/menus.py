@@ -10,20 +10,23 @@ from restaurant_menu_app.db.cache.cache_utils import (
     is_cached,
     set_cache,
 )
-from restaurant_menu_app.db.main_db import crud
+from restaurant_menu_app.db.main_db.crud.abstract_crud import AbstractCRUD
+from restaurant_menu_app.db.main_db.crud.menus import MenuCRUD
 from restaurant_menu_app.db.main_db.database import get_db
 from restaurant_menu_app.schemas.scheme import MenuCreate, MenuInfo, MenuUpdate, Message
-from restaurant_menu_app.services.service_mixin import ServiceMixin
 
 
-class MenuService(ServiceMixin):
+class MenuService:
+    def __init__(self, menu_crud: AbstractCRUD) -> None:
+        self.menu_crud = menu_crud
+
     async def get_list(self) -> list[MenuInfo]:
         """Получить список меню."""
 
         if await is_cached("menu", "all"):
             return await get_cache("menu", "all")
 
-        menus = await crud.read_menus(self.db)
+        menus = await self.menu_crud.read_all()
         await set_cache("menu", "all", menus)
         return menus
 
@@ -33,7 +36,7 @@ class MenuService(ServiceMixin):
         if await is_cached("menu", menu_id):
             return await get_cache("menu", menu_id)
 
-        menu = await crud.read_menu(menu_id, self.db)
+        menu = await self.menu_crud.read(menu_id)
         if not menu:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
@@ -46,7 +49,7 @@ class MenuService(ServiceMixin):
         """Cоздать меню."""
 
         try:
-            new_menu = await crud.create_menu(data, self.db)
+            new_menu = await self.menu_crud.create(data)
         except IntegrityError as e:
             if "UniqueViolationError" in str(e.orig):
                 raise HTTPException(
@@ -56,7 +59,7 @@ class MenuService(ServiceMixin):
             else:
                 raise
 
-        created_menu = await crud.read_menu(new_menu.id, self.db)
+        created_menu = await self.menu_crud.read(new_menu.id)
         await set_cache("menu", new_menu.id, created_menu)
         await clear_cache("menu", "all")  # чистим кэш получения списка меню
         return created_menu
@@ -64,14 +67,14 @@ class MenuService(ServiceMixin):
     async def update(self, menu_id: str, patch: MenuUpdate) -> MenuInfo:
         """Обновить меню."""
 
-        if not await crud.read_menu(menu_id, self.db):
+        if not await self.menu_crud.read(menu_id):
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail="menu not found",
             )
 
-        await crud.update_menu(menu_id, patch, self.db)
-        updated_menu = await crud.read_menu(menu_id, self.db)
+        await self.menu_crud.update(menu_id, patch)
+        updated_menu = await self.menu_crud.read(menu_id)
         await set_cache("menu", menu_id, updated_menu)
         await clear_cache("menu", "all")  # чистим кэш получения списка меню
         return updated_menu
@@ -79,17 +82,18 @@ class MenuService(ServiceMixin):
     async def delete(self, menu_id: str) -> Message:
         """Удалить меню."""
 
-        if not await crud.read_menu(menu_id, self.db):
+        if not await self.menu_crud.read(menu_id):
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail="menu not found",
             )
 
-        await crud.delete_menu(menu_id, self.db)
+        await self.menu_crud.delete(menu_id)
         await clear_cache("menu", menu_id)
         await clear_cache("menu", "all")  # чистим кэш получения списка меню
         return Message(status=True, message="The menu has been deleted")
 
 
 def get_menu_service(db: AsyncSession = Depends(get_db)) -> MenuService:
-    return MenuService(db=db)
+    menu_crud = MenuCRUD(db=db)
+    return MenuService(menu_crud=menu_crud)

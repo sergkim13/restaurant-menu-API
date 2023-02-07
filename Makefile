@@ -30,3 +30,6 @@ test:
 
 test-coverage:
 	poetry run pytest --cov-report term-missing --cov=restaurant_menu_app --cov-report xml
+
+rabbit:
+	docker compose --env-file .env -f docker-compose.rabbit.yml up -d
