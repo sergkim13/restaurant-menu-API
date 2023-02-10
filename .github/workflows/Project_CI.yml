@@ -33,6 +33,7 @@ jobs:
           --health-retries 5
 
     steps:
+    - uses: actions/checkout@v3
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v1.3
       with:
@@ -45,9 +46,9 @@ jobs:
         envkey_REDIS_PORT: 6379
         envkey_REDIS_DB: 1
         envkey_REDIS_EXP: 100
+        directory: restaurant_menu_FastAPI/restaurant_menu_FastAPI
         file_name: .env
         fail_on_empty: false
-    - uses: actions/checkout@v3
     - uses: actions/setup-python@v3
     - run: pipx install poetry==1.2.2
     - run: make install
