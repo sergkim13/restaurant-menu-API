@@ -37,6 +37,7 @@ jobs:
     - name: 'Create env file'
       run: |
         touch .env
+        echo DB_NAME=test >> .env
         echo TEST_DB_NAME=test >> .env
         echo DB_USER=test >> .env
         echo DB_PASS=test >> .env
@@ -49,7 +50,7 @@ jobs:
     - uses: actions/setup-python@v3
     - run: pipx install poetry==1.2.2
     - run: make install
-    - run: make hooks
+    - run: make migration
     - name: test & publish code coverage
       uses: paambaati/codeclimate-action@v2.7.4
       env:
