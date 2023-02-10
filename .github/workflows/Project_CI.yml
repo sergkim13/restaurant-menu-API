@@ -21,6 +21,7 @@ jobs:
         envkey_REDIS_DB: 1
         envkey_REDIS_EXP: 100
         file_name: .env
+        directory: restaurant_menu_FastAPI
         fail_on_empty: false
 
   container-job:
