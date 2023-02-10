@@ -13,7 +13,7 @@ jobs:
       postgres:
         image: postgres:15.1-alpine
         env:
-          POSTGRES_DB: postgres
+          POSTGRES_DB: test_restaurant_db
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         ports:
@@ -36,7 +36,6 @@ jobs:
     - uses: actions/setup-python@v3
     - run: pipx install poetry==1.2.2
     - run: make install
-    - run: make migration
       env:
         TEST_DB_NAME: postgres
         DB_USER: postgres
