@@ -3,25 +3,6 @@ name: project CI
 on: push
 
 jobs:
-  create-envfile:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Make envfile
-      uses: SpicyPizza/create-envfile@v1.3
-      with:
-        envkey_TEST_DB_NAME: test
-        envkey_DB_USER: test
-        envkey_DB_PASS: test
-        envkey_DB_HOST: postgres
-        envkey_DB_PORT: 5432
-        envkey_REDIS_HOST: redis
-        envkey_REDIS_PORT: 6379
-        envkey_REDIS_DB: 1
-        envkey_REDIS_EXP: 100
-        file_name: .env
-        fail_on_empty: false
 
   container-job:
     runs-on: ubuntu-latest
@@ -52,6 +33,20 @@ jobs:
           --health-retries 5
 
     steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envkey_TEST_DB_NAME: test
+        envkey_DB_USER: test
+        envkey_DB_PASS: test
+        envkey_DB_HOST: postgres
+        envkey_DB_PORT: 5432
+        envkey_REDIS_HOST: redis
+        envkey_REDIS_PORT: 6379
+        envkey_REDIS_DB: 1
+        envkey_REDIS_EXP: 100
+        file_name: .env
+        fail_on_empty: false
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v3
     - run: pipx install poetry==1.2.2
