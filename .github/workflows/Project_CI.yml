@@ -51,6 +51,7 @@ jobs:
     - run: pipx install poetry==1.2.2
     - run: make install
     - run: make migration
+    - run: poetry run celery -A restaurant_menu_app.tasks.tasks_app:celery_app worker --loglevel=INFO
     - name: test & publish code coverage
       uses: paambaati/codeclimate-action@v2.7.4
       env:
