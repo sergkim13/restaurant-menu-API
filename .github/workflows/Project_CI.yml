@@ -32,26 +32,26 @@ jobs:
           --health-retries 5
 
   steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
-    - run: pipx install poetry==1.2.2
-    - run: make install
-    - run: make migration
-      env:
-        TEST_DB_NAME: postgres
-        DB_USER: postgres
-        DB_PASS: postgres
-        DB_HOST: postgres
-        DB_PORT: 5432
-        REDIS_HOST: redis
-        REDIS_PORT: 6379
-        REDIS_DB: 1
-        REDIS_EXP: 300
-    - name: run hooks
-      run: make hooks
-    - name: test & publish code coverage
-      uses: paambaati/codeclimate-action@v2.7.4
-      env:
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-      with:
-        coverageCommand: make test-coverage
+  - uses: actions/checkout@v3
+  - uses: actions/setup-python@v3
+  - run: pipx install poetry==1.2.2
+  - run: make install
+  - run: make migration
+    env:
+      TEST_DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+      REDIS_EXP: 300
+  - name: run hooks
+    run: make hooks
+  - name: test & publish code coverage
+    uses: paambaati/codeclimate-action@v2.7.4
+    env:
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+    with:
+      coverageCommand: make test-coverage
