@@ -51,11 +51,14 @@ jobs:
     - run: pipx install poetry==1.2.2
     - run: make install
     - run: make migration
+    - name: Connect to Redis
+      run: node client.js
+      env:
+        REDIS_HOST: redis
+        REDIS_PORT: 6379
     - name: test & publish code coverage
       uses: paambaati/codeclimate-action@v2.7.4
       env:
-        REDIS_PORT: redis
-        REDIS_HOST: 6379
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       with:
         coverageCommand: make test-coverage
