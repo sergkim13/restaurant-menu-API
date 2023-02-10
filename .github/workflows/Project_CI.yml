@@ -34,21 +34,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Make envfile
-      uses: SpicyPizza/create-envfile@v1.3
-      with:
-        envkey_TEST_DB_NAME: test
-        envkey_DB_USER: test
-        envkey_DB_PASS: test
-        envkey_DB_HOST: postgres
-        envkey_DB_PORT: 5432
-        envkey_REDIS_HOST: redis
-        envkey_REDIS_PORT: 6379
-        envkey_REDIS_DB: 1
-        envkey_REDIS_EXP: 100
-        directory: restaurant_menu_FastAPI/restaurant_menu_FastAPI
-        file_name: .env
-        fail_on_empty: false
+    - name: 'Create env file'
+      run: |
+        touch .env
+        echo TEST_DB_NAME=test >> .env
+        echo DB_USER=test >> .env
+        echo DB_PASS=test >> .env
+        echo DB_HOST=postgres >> .env
+        echo DB_PORT=5432 >> .env
+        echo REDIS_HOST=redis >> .env
+        echo REDIS_PORT=6379 >> .env
+        echo REDIS_DB=1 >> .env
+        echo REDIS_EXP=100 >> .env
     - uses: actions/setup-python@v3
     - run: pipx install poetry==1.2.2
     - run: make install
