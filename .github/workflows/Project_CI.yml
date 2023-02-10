@@ -52,7 +52,7 @@ jobs:
     - run: make install
     - run: make migration
     - name: Connect to Redis
-      run: node client.js
+      run: python3 restaurant_menu_app/db/cache/cache_settings.py
       env:
         REDIS_HOST: redis
         REDIS_PORT: 6379
