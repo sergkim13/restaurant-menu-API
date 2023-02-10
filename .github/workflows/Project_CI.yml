@@ -49,11 +49,10 @@ jobs:
         echo REDIS_EXP=100 >> .env
     - uses: actions/setup-python@v3
     - run: pipx install poetry==1.2.2
-    - run: poetry config virtualenvs.create false
-    - run: poetry install
-    - run: alembic upgrade head
+    - run: make install
+    - run: make migration
     - name: Connect to Redis
-      run: python3 restaurant_menu_app/db/cache/cache_settings.py
+      run: poetry run python3 restaurant_menu_app/db/cache/cache_settings.py
       env:
         REDIS_HOST: redis
         REDIS_PORT: 6379
