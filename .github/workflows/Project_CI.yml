@@ -43,7 +43,7 @@ jobs:
         echo DB_PASS=test >> .env
         echo DB_HOST=localhost >> .env
         echo DB_PORT=5432 >> .env
-        echo REDIS_HOST=redis >> .env
+        echo REDIS_HOST=localhost >> .env
         echo REDIS_PORT=6379 >> .env
         echo REDIS_DB=1 >> .env
         echo REDIS_EXP=100 >> .env
@@ -51,7 +51,6 @@ jobs:
     - run: pipx install poetry==1.2.2
     - run: make install
     - run: make migration
-    - run: poetry run celery -A restaurant_menu_app.tasks.tasks_app:celery_app worker --loglevel=INFO
     - name: test & publish code coverage
       uses: paambaati/codeclimate-action@v2.7.4
       env:
