@@ -1,0 +1,57 @@
+name: Project CI
+
+on: push
+
+jobs:
+  container-job:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+    services:
+      postgres:
+        image: postgres:15.1-alpine
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:latest
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - run: pipx install poetry==1.2.2
+    - run: make install
+    - run: make migration
+      env:
+        TEST_DB_NAME: postgres
+        DB_USER: postgres
+        DB_PASS: postgres
+        DB_HOST: postgres
+        DB_PORT: 5432
+        REDIS_HOST: redis
+        REDIS_PORT: 6379
+        REDIS_DB: 1
+        REDIS_EXP: 300
+    - name: run hooks
+      run: make hooks
+    - name: test & publish code coverage
+      uses: paambaati/codeclimate-action@v2.7.4
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      with:
+        coverageCommand: make test-coverage
