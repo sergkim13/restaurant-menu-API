@@ -3,6 +3,26 @@ name: project CI
 on: push
 
 jobs:
+  create-envfile:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envkey_TEST_DB_NAME: test
+        envkey_DB_USER: test
+        envkey_DB_PASS: test
+        envkey_DB_HOST: postgres
+        envkey_DB_PORT: 5432
+        envkey_REDIS_HOST: redis
+        envkey_REDIS_PORT: 6379
+        envkey_REDIS_DB: 1
+        envkey_REDIS_EXP: 100
+        file_name: .env
+        fail_on_empty: false
+
   container-job:
     runs-on: ubuntu-latest
     strategy:
@@ -13,9 +33,9 @@ jobs:
       postgres:
         image: postgres:15.1-alpine
         env:
-          POSTGRES_DB: test_restaurant_db
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
         ports:
           - 5432:5432
         options: >-
@@ -36,18 +56,8 @@ jobs:
     - uses: actions/setup-python@v3
     - run: pipx install poetry==1.2.2
     - run: make install
-      env:
-        TEST_DB_NAME: postgres
-        DB_USER: postgres
-        DB_PASS: postgres
-        DB_HOST: postgres
-        DB_PORT: 5432
-        REDIS_HOST: redis
-        REDIS_PORT: 6379
-        REDIS_DB: 1
-        REDIS_EXP: 300
-    - name: run hooks
-      run: make hooks
+    - run: make migration
+    - run: make hooks
     - name: test & publish code coverage
       uses: paambaati/codeclimate-action@v2.7.4
       env:
