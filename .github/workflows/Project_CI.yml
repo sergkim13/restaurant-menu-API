@@ -26,6 +26,8 @@ jobs:
           --health-retries 5
       redis:
         image: redis:latest
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
@@ -43,7 +45,7 @@ jobs:
         echo DB_PASS=test >> .env
         echo DB_HOST=localhost >> .env
         echo DB_PORT=5432 >> .env
-        echo REDIS_HOST=localhost >> .env
+        echo REDIS_HOST=redis >> .env
         echo REDIS_PORT=6379 >> .env
         echo REDIS_DB=1 >> .env
         echo REDIS_EXP=100 >> .env
