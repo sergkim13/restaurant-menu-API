@@ -41,7 +41,7 @@ jobs:
         echo TEST_DB_NAME=test >> .env
         echo DB_USER=test >> .env
         echo DB_PASS=test >> .env
-        echo DB_HOST=postgres >> .env
+        echo DB_HOST=localhost >> .env
         echo DB_PORT=5432 >> .env
         echo REDIS_HOST=redis >> .env
         echo REDIS_PORT=6379 >> .env
