@@ -21,7 +21,6 @@ jobs:
         envkey_REDIS_DB: 1
         envkey_REDIS_EXP: 100
         file_name: .env
-        directory: restaurant_menu_FastAPI
         fail_on_empty: false
 
   container-job:
@@ -57,7 +56,6 @@ jobs:
     - uses: actions/setup-python@v3
     - run: pipx install poetry==1.2.2
     - run: make install
-    - run: make migration
     - run: make hooks
     - name: test & publish code coverage
       uses: paambaati/codeclimate-action@v2.7.4
