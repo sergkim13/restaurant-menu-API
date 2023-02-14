@@ -35,9 +35,6 @@ You will get `task_id` as a response.
 7. To download xlsx-file with all data:
 `GET http://0.0.0.0:8000/api/v1/content_as_file/{task_id}`
 
-Pre-commit hooks demo:
-[![asciicast](https://asciinema.org/a/UoPQrqTPphCQbaCHselI5VPYU.svg)](https://asciinema.org/a/UoPQrqTPphCQbaCHselI5VPYU)
-
 
 ### **Task description**
 <details>
@@ -58,6 +55,8 @@ Pre-commit hooks demo:
 - Код должен проходить все линтеры (black, autopep, flake8, mypy, isort). Файл с pre-commit хуками будет приложен к презентаций.
 - Проект должен соответствовать требованиям в предыдущих вебинарах.
 
+Pre-commit hooks demo:
+[![asciicast](https://asciinema.org/a/UoPQrqTPphCQbaCHselI5VPYU.svg)](https://asciinema.org/a/UoPQrqTPphCQbaCHselI5VPYU)
 
 
 __________
