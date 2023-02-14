@@ -38,7 +38,12 @@ You will get `task_id` as a response.
 Pre-commit hooks demo:
 [![asciicast](https://asciinema.org/a/UoPQrqTPphCQbaCHselI5VPYU.svg)](https://asciinema.org/a/UoPQrqTPphCQbaCHselI5VPYU)
 
-### **Task description (stage №4)**
+
+### **Task description**
+<details open>
+    <summary>Click to show</summary>
+
+### **Task description (stage №4)** - ✅
 В этом домашнем задании надо:
 1. Переписать текущее FastAPI приложение на асинхронное выполнение.
 2. Добавить в проект фоновую задачу с помощью Celery + RabbitMQ.
@@ -112,3 +117,4 @@ __________
 - Во время выдачи списка меню, для каждого меню добавлять кол-во подменю и блюд в этом меню.
 - Во время выдачи списка подменю, для каждого подменю добавлять кол-во блюд в этом подменю.
 - Во время запуска тестового сценария БД должна быть пуста.
+</details>
