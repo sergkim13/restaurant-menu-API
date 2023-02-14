@@ -40,7 +40,7 @@ Pre-commit hooks demo:
 
 
 ### **Task description**
-<details open>
+<details>
     <summary>Click to show</summary>
 
 ### **Task description (stage №4)** - ✅
