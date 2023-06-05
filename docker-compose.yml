@@ -6,7 +6,11 @@ services:
     volumes:
       - tasks-data:/src/data
     env_file:
-      - .docker.env
+      - .env
+    environment:
+      DB_HOST: 'postgres_db'
+      REDIS_HOST: 'redis_db'
+      RABBITMQ_HOST: 'rabbitmq'
     build:
       context: .
       dockerfile: Dockerfile
@@ -34,7 +38,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/
     env_file:
-      - .docker.env
+      - .env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -71,7 +75,9 @@ services:
     volumes:
       - tasks-data:/celery/data
     env_file:
-      - .docker.env
+      - .env
+    environment:
+      RABBITMQ_HOST: 'rabbitmq'
     build:
       context: .
       dockerfile: Dockerfile.celery
@@ -89,7 +95,7 @@ services:
     container_name: rabbitmq
     image: rabbitmq:latest
     env_file:
-      - .docker.env
+      - .env
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}

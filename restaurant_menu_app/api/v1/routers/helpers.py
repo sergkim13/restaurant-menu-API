@@ -35,7 +35,7 @@ async def create_file_with_full_content(helper_service: HelperServise = Depends(
 
 @router.get(
     path="/content_as_file/{task_id}",
-    summary="Получение резльутата задачи на получение всех данных в excel-файле",
+    summary="Получение результата задачи на получение всех данных в excel-файле",
     status_code=HTTPStatus.OK,
     response_class=FileResponse,
 )

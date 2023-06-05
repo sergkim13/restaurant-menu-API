@@ -15,6 +15,10 @@ Made with:
 - Celery,
 - RabbitMQ.
 
+<div id="header" align="left">
+  <img src="https://raw.githubusercontent.com/sergkim13/static/main/restaraunt_menu/restaurant_menu.gif" width="800"/>
+</div>
+
 ### Requirements:
 1. MacOS (prefer) / Linux / Windows10
 2. `Docker`
@@ -22,17 +26,18 @@ Made with:
 
 ### Install:
 1. Clone repository: `https://github.com/sergkim13/restaurant_menu_FastAPI.git`
-2. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `make stop` to stop app container.
-3. Type `make compose-test` for running tests in docker container. Type `make stop-test` to stop app container.
-4. For checking `pre-commit hooks` you need `Poetry` and install dependencies:
+2. Create `.env` and fill it up according to `.env.example`.
+3. Type `make compose` for running application in docker container. App will be running at http://0.0.0.0:8000. Type `make stop` to stop app container.
+4. Type `make compose-test` for running tests in docker container. Type `make stop-test` to stop app container.
+5. For checking `pre-commit hooks` you need `Poetry` and install dependencies:
     - `make install`
     - `make hooks`
-5. To generate test data:
+6. To generate test data:
 `POST http://0.0.0.0:8000/api/v1/generated_test_data`
-6. To create xlsx-file with all data:
+7. To create xlsx-file with all data:
 `POST http://0.0.0.0:8000/api/v1/content_as_file`
 You will get `task_id` as a response.
-7. To download xlsx-file with all data:
+8. To download xlsx-file with all data:
 `GET http://0.0.0.0:8000/api/v1/content_as_file/{task_id}`
 
 

@@ -4,8 +4,11 @@ services:
   restaurant_menu_app:
     container_name: restaurant_menu_app
     env_file:
-      - .docker-test.env
+      - .env
     environment:
+      DB_HOST: 'test_postgres_db'
+      REDIS_HOST: 'test_redis_db'
+      REDIS_DB: 1
       DB_NAME: ${TEST_DB_NAME}
     build:
       context: .
@@ -29,7 +32,7 @@ services:
     volumes:
       - test-db-data:/var/lib/postgresql/data/
     env_file:
-      - .docker-test.env
+      - .env
     environment:
       POSTGRES_DB: ${TEST_DB_NAME}
       POSTGRES_USER: ${DB_USER}
