@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Sergey Kim <<sergkim7@gmail.com>>"]
 readme = "README.md"
-packages = [{include = "restaurant_menu_app"}]
+
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
